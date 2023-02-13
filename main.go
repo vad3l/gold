@@ -6,9 +6,9 @@ import (
 
 func main() {
 	ebiten.SetWindowSize(1280, 720) 
-
-	g := &Game{
-		current_scene: &Menu{},
+	ebiten.SetMaxTPS(200)
+	g := &SceneManager{
+		current_scene: NewMenuScene(),
 	}
 
 	if err := ebiten.RunGame(g); err != nil {
