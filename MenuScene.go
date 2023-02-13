@@ -62,15 +62,15 @@ func NewMenuScene () *MenuScene {
 
 
 
-	spriteButton := NewSpriteButton(Point{530,500},"menuButton.png","menuButtonSelected.png",
+	spriteButton := NewSpriteButton(Point{530,500},"menuButton.png","menuButtonSelected.png","menuButton.png",
 	func(g *SceneManager) {
 		os.Exit(0)
 	})	
 	spriteButton.setScale(0.2)
 	
-	pauseButton := NewSpriteButton(Point{800,300},"pauseUp.png","pausePush.png",
+	pauseButton := NewSpriteButton(Point{800,300},"pause.png","pauseHover.png","pauseClicked.png",
 	func(g *SceneManager) {
-		ebiten.SetFullscreen(!ebiten.IsFullscreen());
+		//ebiten.SetFullscreen(!ebiten.IsFullscreen());
 	})	
 	pauseButton.setScale(0.2)
 	return &MenuScene{

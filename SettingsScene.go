@@ -10,14 +10,14 @@ import (
 type SettingsScene struct {
 	bigcontour	*Contour
 	biglabel	*Label
-	bigcheckbox	*Checkbox
+	//bigcheckbox	*Checkbox
 	backButton	*Button
 }
 
 func NewSettingsScene () *SettingsScene {
 
 
-	bigcheckbox := Checkbox{
+	/*bigcheckbox := Checkbox{
 		0,
 		[]string{ "niggure", "nighga" },
 		[]Point{ Point{200, 200}, Point{300, 200} },
@@ -25,7 +25,7 @@ func NewSettingsScene () *SettingsScene {
 		func(g *SceneManager, i int) {
 			fmt.Println("bigCheckBox")
 		},
-	}
+	}*/
 
 	bigcontour := Contour{
 		Point{500,500},
@@ -56,7 +56,7 @@ func NewSettingsScene () *SettingsScene {
 	return &SettingsScene{
 		&bigcontour,
 		&biglabel,
-		&bigcheckbox,
+		//&bigcheckbox,
 		&backButton,
 	}
 }
@@ -64,14 +64,14 @@ func NewSettingsScene () *SettingsScene {
 func (m *SettingsScene) Draw (screen *ebiten.Image) {
 	screen.Fill(color.RGBA{ 0xb9, 0xf3, 0xff, 0xff })
 	m.backButton.Draw(screen)
-	m.bigcheckbox.Draw(screen)
+	//m.bigcheckbox.Draw(screen)
 	m.biglabel.Draw(screen)
 	m.bigcontour.Draw(screen)
 }
 
 func (m *SettingsScene) Update(g *SceneManager) error {
 	m.backButton.Input(g)
-	m.bigcheckbox.Input(g)
+	//m.bigcheckbox.Input(g)
 	return nil
 }
 

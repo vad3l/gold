@@ -33,6 +33,7 @@ type Button struct{
 
 	radius	int
 	execute	func(g *SceneManager)
+	img	*ebiten.Image
 }
 
 func NewButton (size, position Point, text string, execute func(g *SceneManager)) Button{
@@ -51,10 +52,13 @@ func NewButton (size, position Point, text string, execute func(g *SceneManager)
 		color.RGBA{0x00, 0x00, 0x00, 0xff},
 		0,
 		execute,
+		nil,
 	}
 }
 
 func (b *Button) Draw (screen *ebiten.Image) {
+	img := ebiten.NewImage(int(b.size.x), int(b.size.y))
+	b.img = img
 	x, y := ebiten.CursorPosition()
 	pCursor := Point{float64(x),float64(y)}
 	
@@ -63,39 +67,43 @@ func (b *Button) Draw (screen *ebiten.Image) {
 	if (height == 0){
 		height = int(b.fontSize / 2 ) - 3 
 	}
-	tx := int(b.position.x) + int(b.size.x / 2) - (fontDimension.Max.X /2 )
-	ty := int(b.position.y) + int(b.size.y / 2) + height
+	tx := int(b.size.x / 2) - (fontDimension.Max.X /2 )
+	ty := int(b.size.y / 2) + height
 
 	if (b.radius == 0){
-		ebitenutil.DrawRect(screen, b.position.x, b.position.y, b.size.x, b.size.y, b.colorButton)
+		ebitenutil.DrawRect(img, 0, 0, b.size.x, b.size.y, b.colorButton)
 		if b.hover(pCursor) {
-			ebitenutil.DrawRect(screen, b.position.x+b.borderSize, b.position.y+b.borderSize, b.size.x-b.borderSize*2, b.size.y-b.borderSize*2, b.colorButtonHover)
-			text.Draw(screen, b.text, b.font, tx, ty, b.colorTextHover)
+			ebitenutil.DrawRect(img, b.borderSize, b.borderSize, b.size.x-b.borderSize*2, b.size.y-b.borderSize*2, b.colorButtonHover)
+			text.Draw(img, b.text, b.font, tx, ty, b.colorTextHover)
 		} else {
-			text.Draw(screen, b.text, b.font, tx, ty, b.colorText)
+			text.Draw(img, b.text, b.font, tx, ty, b.colorText)
 		}
 	}else{
-		ebitenutil.DrawRect(screen, b.position.x, b.position.y + float64(b.radius), b.size.x, b.size.y - 2*float64(b.radius), b.colorButton)
-		ebitenutil.DrawRect(screen, b.position.x + float64(b.radius), b.position.y, b.size.x - 2*float64(b.radius), b.size.y, b.colorButton)
+		ebitenutil.DrawRect(img, 0, 0 + float64(b.radius), b.size.x, b.size.y - 2*float64(b.radius), b.colorButton)
+		ebitenutil.DrawRect(img, 0 + float64(b.radius), 0, b.size.x - 2*float64(b.radius), b.size.y, b.colorButton)
 
-		ebitenutil.DrawCircle(screen, b.position.x + float64(b.radius), b.position.y + float64(b.radius), float64(b.radius), b.colorButton)
-		ebitenutil.DrawCircle(screen, b.position.x + b.size.x - float64(b.radius), b.position.y + float64(b.radius), float64(b.radius), b.colorButton)
-		ebitenutil.DrawCircle(screen, b.position.x + float64(b.radius), b.position.y + b.size.y - float64(b.radius), float64(b.radius), b.colorButton)
-		ebitenutil.DrawCircle(screen, b.position.x + b.size.x - float64(b.radius), b.position.y + b.size.y - float64(b.radius), float64(b.radius), b.colorButton)
+		ebitenutil.DrawCircle(img, 0 + float64(b.radius), 0 + float64(b.radius), float64(b.radius), b.colorButton)
+		ebitenutil.DrawCircle(img, 0 + b.size.x - float64(b.radius), 0 + float64(b.radius), float64(b.radius), b.colorButton)
+		ebitenutil.DrawCircle(img, 0 + float64(b.radius), 0 + b.size.y - float64(b.radius), float64(b.radius), b.colorButton)
+		ebitenutil.DrawCircle(img, 0 + b.size.x - float64(b.radius), 0 + b.size.y - float64(b.radius), float64(b.radius), b.colorButton)
 		if b.hover(pCursor) {
-			ebitenutil.DrawRect(screen, b.position.x+b.borderSize, b.position.y+b.borderSize  + float64(b.radius), b.size.x-b.borderSize*2, b.size.y-b.borderSize*2 - 2*float64(b.radius), b.colorButtonHover)
-			ebitenutil.DrawRect(screen, b.position.x+b.borderSize + float64(b.radius), b.position.y+b.borderSize, b.size.x-b.borderSize*2 - 2*float64(b.radius), b.size.y-b.borderSize*2, b.colorButtonHover)
+			ebitenutil.DrawRect(img, b.borderSize, b.borderSize  + float64(b.radius), b.size.x-b.borderSize*2, b.size.y-b.borderSize*2 - 2*float64(b.radius), b.colorButtonHover)
+			ebitenutil.DrawRect(img, b.borderSize + float64(b.radius), b.borderSize, b.size.x-b.borderSize*2 - 2*float64(b.radius), b.size.y-b.borderSize*2, b.colorButtonHover)
 
-			ebitenutil.DrawCircle(screen, b.position.x+b.borderSize + float64(b.radius), b.position.y+b.borderSize + float64(b.radius), float64(b.radius), b.colorButtonHover)
-			ebitenutil.DrawCircle(screen, b.position.x+b.borderSize + b.size.x-b.borderSize*2 - float64(b.radius), b.position.y+b.borderSize + float64(b.radius), float64(b.radius), b.colorButtonHover)
-			ebitenutil.DrawCircle(screen, b.position.x+b.borderSize + float64(b.radius), b.position.y+b.borderSize + b.size.y-b.borderSize*2 - float64(b.radius), float64(b.radius), b.colorButtonHover)
-			ebitenutil.DrawCircle(screen, b.position.x+b.borderSize + b.size.x-b.borderSize*2 - float64(b.radius), b.position.y+b.borderSize + b.size.y-b.borderSize*2 - float64(b.radius), float64(b.radius), b.colorButtonHover)
-			text.Draw(screen, b.text, b.font, tx, ty, b.colorTextHover)
+			ebitenutil.DrawCircle(img, b.borderSize + float64(b.radius), b.borderSize + float64(b.radius), float64(b.radius), b.colorButtonHover)
+			ebitenutil.DrawCircle(img, b.borderSize + b.size.x-b.borderSize*2 - float64(b.radius), b.borderSize + float64(b.radius), float64(b.radius), b.colorButtonHover)
+			ebitenutil.DrawCircle(img, b.borderSize + float64(b.radius), b.borderSize + b.size.y-b.borderSize*2 - float64(b.radius), float64(b.radius), b.colorButtonHover)
+			ebitenutil.DrawCircle(img, b.borderSize + b.size.x-b.borderSize*2 - float64(b.radius), b.borderSize + b.size.y-b.borderSize*2 - float64(b.radius), float64(b.radius), b.colorButtonHover)
+			text.Draw(img, b.text, b.font, tx, ty, b.colorTextHover)
 		}else{
-			text.Draw(screen, b.text, b.font, tx, ty, b.colorText)
+			text.Draw(img, b.text, b.font, tx, ty, b.colorText)
 		}
-		
 	}
+
+	ot := &ebiten.DrawImageOptions{}
+	ot.GeoM.Translate(b.position.x, b.position.y)
+	b.img = img
+	screen.DrawImage(img, ot)
 }
 
 func (b *Button) Input (g *SceneManager) {
@@ -117,7 +125,14 @@ func (b *Button) hover (pCursor Point) bool  {
 	if distance <= float64(circle.Radius) {
 		return true
 	}*/
-	return ((pCursor.x <= (b.size.x + b.position.x) && pCursor.x >= b.position.x) && (pCursor.y <= (b.size.y + b.position.y) && pCursor.y >= b.position.y))
+	if ((pCursor.x <= (b.size.x + b.position.x) && pCursor.x >= b.position.x) && (pCursor.y <= (b.size.y + b.position.y) && pCursor.y >= b.position.y)){
+		c := b.img.At(int(pCursor.x) - int(b.position.x), int(pCursor.y)- int(b.position.y) ).(color.RGBA)	
+		if c.A > 0 {
+			return true
+		}
+		return false
+	}
+	return false
 }
 
 func (b *Button) setRadius (radius int) {
@@ -204,21 +219,24 @@ type SpriteButton struct{
 
 	imgDefault	*ebiten.Image
 	imgHover	*ebiten.Image
+	imgClicked	*ebiten.Image
 	
 	execute	func(g *SceneManager)
 }
 
-func NewSpriteButton (position Point, pathImgDefault, pathImgHover string, execute func(g *SceneManager)) SpriteButton{
+func NewSpriteButton (position Point, pathImgDefault, pathImgHover, pathImgClicked string, execute func(g *SceneManager)) SpriteButton{
 	imgDefault, _, err := ebitenutil.NewImageFromFile("data/image/button/"+pathImgDefault)
 	imgHover, _, errs := ebitenutil.NewImageFromFile("data/image/button/"+pathImgHover)
-	if err != nil  || errs != nil{
-		log.Fatalf("Failed to load image for sprite button :\n%s\n%s",pathImgDefault,pathImgHover)
+	imgClicked, _, erres := ebitenutil.NewImageFromFile("data/image/button/"+pathImgClicked)
+	if (err != nil  || errs != nil || erres != nil ){
+		log.Fatalf("Failed to load image for sprite button :\n%s\n%s\n%s",pathImgDefault,pathImgHover,pathImgClicked)
 	}
 
 	xDef,yDef := imgDefault.Size()
 	xHov,yHov := imgHover.Size()
-	if (xDef != xHov || yDef != yHov ){
-		log.Fatalf("ERROR with spriteButton default and hover image must have the same dimension")
+	xCli,yCli := imgClicked.Size()
+	if (xDef != xHov || yDef != yHov || xDef != xCli || yDef != yCli ){
+		log.Fatalf("ERROR with spriteButton the 3 image don't have same dimension")
 	}
 
 	return SpriteButton{
@@ -226,6 +244,7 @@ func NewSpriteButton (position Point, pathImgDefault, pathImgHover string, execu
 		1,
 		imgDefault,
 		imgHover,
+		imgClicked,
 		execute,
 	}
 }
@@ -239,8 +258,12 @@ func (b *SpriteButton) Draw (screen *ebiten.Image) {
 	x, y := ebiten.CursorPosition()
 	pCursor := Point{float64(x),float64(y)}
 	if b.hover(pCursor) {
-		screen.DrawImage(b.imgHover, ot)
-	}else{
+		if (ebiten.IsMouseButtonPressed(ebiten.MouseButtonLeft)){
+			screen.DrawImage(b.imgClicked, ot)
+		}else{
+			screen.DrawImage(b.imgHover, ot)
+		}
+	}else {
 		screen.DrawImage(b.imgDefault, ot)
 	}
 }
