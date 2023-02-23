@@ -1,4 +1,4 @@
-module GUI
+module github.com/Vad3L/GUI
 
 go 1.19
 

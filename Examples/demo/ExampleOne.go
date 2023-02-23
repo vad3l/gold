@@ -2,15 +2,11 @@ package main
 
 import (
 	"image/color"
+	."Framework"
 	"fmt"
 	"os"
 
-	."GUI/Scene"
-	."GUI/Widgets"
-	."GUI/Utilities"
-
 	"github.com/hajimehoshi/ebiten/v2"
-	//"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 )
 
 type ExampleOne struct {
@@ -26,21 +22,11 @@ func NewExampleOne () *ExampleOne {
 	width, _ := ebiten.WindowSize()
 	widthWindow := float64(width) /2 - buttonWidth /2 
 	 
-	playButton := NewButton(Point{buttonWidth,buttonHeight},Point{widthWindow,100},"Play",
-		func(g *SceneManager) {
-			fmt.Println("Play")
-		})
-
-	settingsButton := NewButton(Point{buttonWidth,buttonHeight},Point{widthWindow,300},"Settings",
-		func(g *SceneManager) {
-			fmt.Println("Settings")
-		})
+	playButton := NewButton(Point{buttonWidth,buttonHeight},Point{widthWindow,100},"Play")
+	settingsButton := NewButton(Point{buttonWidth,buttonHeight},Point{widthWindow,300},"Settings")
 
 
-	quitButton := NewButton(Point{buttonWidth,buttonHeight},Point{widthWindow,500},"Quit",
-		func(g *SceneManager) {
-			os.Exit(0)
-		})
+	quitButton := NewButton(Point{buttonWidth,buttonHeight},Point{widthWindow,500},"Quit")
 
 
 
@@ -61,17 +47,26 @@ func (m *ExampleOne) Draw (screen *ebiten.Image) {
 }
 
 func (m *ExampleOne) Update(g *SceneManager) error {
-	m.playButton.Input(g)
-	m.settingsButton.Input(g)
-	m.quitButton.Input(g)
+	m.playButton.Input()
+	m.settingsButton.Input()
+	m.quitButton.Input()
 
-	if ebiten.IsKeyPressed(ebiten.Key1) { 
-		g.Current_scene = NewExampleOne()
-    } else if ebiten.IsKeyPressed(ebiten.Key2) {
-        g.Current_scene = NewExampleTwo()
-    } else if ebiten.IsKeyPressed(ebiten.Key3) {
-        
-    }
+	if (m.playButton.Execute) {
+		fmt.Println("play")
+		m.playButton.Execute = false
+	}
+
+	if (m.settingsButton.Execute) {
+		g.Current_scene = NewSettingsScene()
+		m.settingsButton.Execute = false
+	}
+
+	if (m.quitButton.Execute) {
+		os.Exit(0)
+		m.quitButton.Execute = false
+	}
+
+	chooseScene(g)	
 	return nil
 }
 

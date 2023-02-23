@@ -1,0 +1,1 @@
+- Checkbox setBorderSize check when too big

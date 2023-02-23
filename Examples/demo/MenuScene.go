@@ -3,13 +3,9 @@ package main
 import (
 	"image/color"
 	"fmt"
-
-	."GUI/Scene"
-	."GUI/Widgets"
-	."GUI/Utilities"
+	."Framework"
 
 	"github.com/hajimehoshi/ebiten/v2"
-	//"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 )
 
 type MenuScene struct {
@@ -25,7 +21,7 @@ func NewMenuScene () *MenuScene {
 		})
 
 	biglabel.SetColor(color.RGBA{0xff,0xff,0xff,0xff})
-	biglabel.SetFont("../../data/font/TTF/dogicapixel.ttf")
+	biglabel.SetFont("data/dogicapixel.ttf")
 	biglabel.SetFontSize(50)
 
 	
@@ -43,13 +39,7 @@ func (m *MenuScene) Draw (screen *ebiten.Image) {
 
 func (m *MenuScene) Update(g *SceneManager) error {
 	m.biglabel.Input(g)
-    if ebiten.IsKeyPressed(ebiten.Key1) { 
-		g.Current_scene = NewExampleOne()
-    } else if ebiten.IsKeyPressed(ebiten.Key2) {
-        g.Current_scene = NewExampleTwo()
-    } else if ebiten.IsKeyPressed(ebiten.Key3) {
-        
-    }
+    chooseScene(g)
 
 	return nil
 }

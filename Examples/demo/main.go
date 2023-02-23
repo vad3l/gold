@@ -1,9 +1,9 @@
 package main
 
 import (
-	."GUI/Scene"
-
+	."Framework"
 	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/hajimehoshi/ebiten/v2/inpututil"
 )
 
 func main() {
@@ -20,3 +20,12 @@ func main() {
 	}
 }
 
+func chooseScene(g *SceneManager) {
+	if inpututil.IsKeyJustReleased(ebiten.Key1) { 
+		g.Current_scene = NewExampleOne()
+    } else if inpututil.IsKeyJustReleased(ebiten.Key2) {
+        g.Current_scene = NewExampleTwo()
+    } else if inpututil.IsKeyJustReleased(ebiten.Key3) {
+		g.Current_scene = NewExampleThree()
+    }
+}

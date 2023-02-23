@@ -2,14 +2,11 @@ package main
 
 import (
 	"image/color"
+	."Framework"
 	"fmt"
 	"os"
-	."GUI/Scene"
-	."GUI/Widgets"
-	."GUI/Utilities"
 
 	"github.com/hajimehoshi/ebiten/v2"
-	//"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 )
 
 type ExampleTwo struct {
@@ -25,44 +22,22 @@ func NewExampleTwo () *ExampleTwo {
 	width, _ := ebiten.WindowSize()
 	widthWindow := float64(width) /2 - buttonWidth /2 
 	 
-	playButton := NewButton(Point{buttonWidth,buttonHeight},Point{widthWindow,100},"Play",
-		func(g *SceneManager) {
-			fmt.Println("Play")
-		})
+	playButton := NewButton(Point{buttonWidth,buttonHeight},Point{widthWindow,100},"Play")
 	playButton.SetRadius(150)
 	playButton.SetColor(color.RGBA{ 0xb5, 0xf1, 0xcc, 0xff })
 	playButton.SetColorHover(color.RGBA{ 0xe5, 0xfd, 0xd1, 0xff })
 	playButton.SetColorText(color.RGBA{ 0xFF ,0xAA ,0xCF, 0xff })
 	playButton.SetColorTextHover(color.RGBA{ 0xFF ,0xAA ,0xCF ,0xff })
-	playButton.SetFont("../../data/font/TTF/dogicapixel.ttf")
+	playButton.SetFont("./data/dogicapixel.ttf")
 	playButton.SetFontSize(35)
 
-	settingsButton := NewButton(Point{buttonWidth,buttonHeight},Point{widthWindow,300},"Settings",
-		func(g *SceneManager) {
-			fmt.Println("Settings")
-		})
-	settingsButton.SetRadius(150)
-	settingsButton.SetColor(color.RGBA{ 0xb5, 0xf1, 0xcc, 0xff })
-	settingsButton.SetColorHover(color.RGBA{ 0xe5, 0xfd, 0xd1, 0xff })
-	settingsButton.SetColorText(color.RGBA{ 0xFF ,0xAA ,0xCF, 0xff })
-	settingsButton.SetColorTextHover(color.RGBA{ 0xFF ,0xAA ,0xCF ,0xff })
-	settingsButton.SetFont("../../data/font/TTF/dogicapixel.ttf")
-	settingsButton.SetFontSize(35)
+	settingsButton := playButton
+	settingsButton.SetText("Settings")
+	settingsButton.SetPosition(Point{widthWindow,300})
 
-
-	quitButton := NewButton(Point{buttonWidth,buttonHeight},Point{widthWindow,500},"Quit",
-		func(g *SceneManager) {
-			os.Exit(0)
-		})
-	quitButton.SetRadius(150)
-	quitButton.SetColor(color.RGBA{ 0xb5, 0xf1, 0xcc, 0xff })
-	quitButton.SetColorHover(color.RGBA{ 0xe5, 0xfd, 0xd1, 0xff })
-	quitButton.SetColorText(color.RGBA{ 0xFF ,0xAA ,0xCF, 0xff })
-	quitButton.SetColorTextHover(color.RGBA{ 0xFF ,0xAA ,0xCF ,0xff })
-	quitButton.SetFont("../../data/font/TTF/dogicapixel.ttf")
-	quitButton.SetFontSize(35)
-
-
+	quitButton := playButton
+	quitButton.SetText("Quit")
+	quitButton.SetPosition(Point{widthWindow,500})
 
 	return &ExampleTwo{
 		&playButton,
@@ -81,16 +56,26 @@ func (m *ExampleTwo) Draw (screen *ebiten.Image) {
 }
 
 func (m *ExampleTwo) Update(g *SceneManager) error {
-	m.playButton.Input(g)
-	m.settingsButton.Input(g)
-	m.quitButton.Input(g)
-	if ebiten.IsKeyPressed(ebiten.Key1) { 
-		g.Current_scene = NewExampleOne()
-    } else if ebiten.IsKeyPressed(ebiten.Key2) {
-        g.Current_scene = NewExampleTwo()
-    } else if ebiten.IsKeyPressed(ebiten.Key3) {
-        
-    }
+	m.playButton.Input()
+	m.settingsButton.Input()
+	m.quitButton.Input()
+
+	if (m.playButton.Execute) {
+		fmt.Println("play")
+		m.playButton.Execute = false
+	}
+
+	if (m.settingsButton.Execute) {
+		g.Current_scene = NewSettingsScene()
+		m.settingsButton.Execute = false
+	}
+
+	if (m.quitButton.Execute) {
+		os.Exit(0)
+		m.quitButton.Execute = false
+	}
+
+	chooseScene(g)
 	return nil
 }
 
