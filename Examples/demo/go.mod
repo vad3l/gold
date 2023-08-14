@@ -2,10 +2,7 @@ module test
 
 go 1.19
 
-require (
-	Framework v0.0.0-00010101000000-000000000000
-	github.com/hajimehoshi/ebiten/v2 v2.4.16
-)
+require github.com/hajimehoshi/ebiten/v2 v2.4.16
 
 require (
 	github.com/ebitengine/purego v0.1.1 // indirect
@@ -18,5 +15,3 @@ require (
 	golang.org/x/mobile v0.0.0-20221110043201-43a038452099 // indirect
 	golang.org/x/sys v0.5.0 // indirect
 )
-
-replace Framework => ../../.

@@ -1,4 +1,4 @@
-package GUI
+package gui
 
 import (
 	"image/color"
@@ -255,7 +255,7 @@ func (b *SpriteButton) Draw (screen *ebiten.Image) {
 	}
 }
 func (b *SpriteButton) Input () {
-	if inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft) {
+	if inpututil.IsMouseButtonJustReleased(ebiten.MouseButtonLeft) {
 		x, y := ebiten.CursorPosition()
 		pCursor := Point{float64(x),float64(y)}
 		xx,yy := b.imgDefault.Size()

@@ -1,7 +1,7 @@
 package main
 
 import (
-	."Framework"
+	"github.com/vad3l/gui"
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
 )

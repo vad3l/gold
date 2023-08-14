@@ -2,7 +2,7 @@ package main
 
 import (
 	"image/color"
-	."Framework"
+	"github.com/vad3l/gui"
 	"fmt"
 	"os"
 
