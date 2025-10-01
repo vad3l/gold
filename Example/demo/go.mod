@@ -2,7 +2,10 @@ module test
 
 go 1.19
 
-require github.com/hajimehoshi/ebiten/v2 v2.4.16
+require (
+	github.com/hajimehoshi/ebiten/v2 v2.4.16
+	github.com/vad3l/gui v0.0.0-20230814194551-f1d80ed08205
+)
 
 require (
 	github.com/ebitengine/purego v0.1.1 // indirect

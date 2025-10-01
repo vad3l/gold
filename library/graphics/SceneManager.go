@@ -1,11 +1,11 @@
-package gui
+package graphics
 
 import (
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
 type SceneManager struct {
-	Current_scene	Scene
+	Current_scene Scene
 }
 
 func (g *SceneManager) Draw(screen *ebiten.Image) {
@@ -13,7 +13,7 @@ func (g *SceneManager) Draw(screen *ebiten.Image) {
 }
 
 func (g *SceneManager) Update() error {
-	return g.Current_scene.Update(g)	
+	return g.Current_scene.Update(g)
 }
 
 func (g *SceneManager) Layout(outsideWidth, outsideHeight int) (int, int) {
