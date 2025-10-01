@@ -15,6 +15,7 @@ type ExampleOne struct {
 	playButton     *Button
 	settingsButton *Button
 	quitButton     *Button
+	slider         *Slider // Ajout du slider
 }
 
 func NewExampleOne() *ExampleOne {
@@ -26,13 +27,16 @@ func NewExampleOne() *ExampleOne {
 
 	playButton := NewButton(Point{buttonWidth, buttonHeight}, Point{widthWindow, 100}, "Play")
 	settingsButton := NewButton(Point{buttonWidth, buttonHeight}, Point{widthWindow, 300}, "Settings")
-
 	quitButton := NewButton(Point{buttonWidth, buttonHeight}, Point{widthWindow, 500}, "Quit")
+
+	// Instanciation du slider
+	slider := NewSlider(Point{400, 40}, Point{widthWindow, 650}, 0, 100, 50)
 
 	return &ExampleOne{
 		&playButton,
 		&settingsButton,
 		&quitButton,
+		&slider, // Ajout du slider
 	}
 }
 
@@ -43,12 +47,14 @@ func (m *ExampleOne) Draw(screen *ebiten.Image) {
 	m.playButton.Draw(screen)
 	m.settingsButton.Draw(screen)
 	m.quitButton.Draw(screen)
+	m.slider.Draw(screen) // Dessine le slider
 }
 
 func (m *ExampleOne) Update(g *SceneManager) error {
 	m.playButton.Input()
 	m.settingsButton.Input()
 	m.quitButton.Input()
+	m.slider.Input() // Gère l'input du slider
 
 	if m.playButton.Execute {
 		fmt.Println("play")

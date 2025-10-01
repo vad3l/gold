@@ -1,7 +1,6 @@
 package gui
 
 import (
-	"fmt"
 	"image/color"
 
 	"github.com/hajimehoshi/ebiten/v2"
@@ -11,95 +10,80 @@ import (
 )
 
 type Slider struct {
-	size Point
-
-	position    Point
-	colorSlider color.RGBA
-	colorButton color.RGBA
-
-	circleCorner bool
-
-	cursorPosition float64
-	max            int
-	img            *ebiten.Image
+	size       Point
+	position   Point
+	barColor   color.RGBA
+	thumbColor color.RGBA
+	min, max   float64
+	value      float64
+	dragging   bool
 }
 
-func NewSlider(size, position Point) Slider {
-	if size.X < size.Y {
-		size = Point{100, 20}
-	}
-	maxInit := 68
-	cursorPosition := maxInit / 2
+func NewSlider(size, position Point, min, max, value float64) Slider {
 	return Slider{
-		size,
-		position,
-		color.RGBA{0xff, 0x00, 0x00, 0xff},
-		color.RGBA{0x00, 0xff, 0x00, 0xff},
-		true,
-		float64(cursorPosition),
-		maxInit,
-		nil,
+		size:       size,
+		position:   position,
+		barColor:   color.RGBA{0xff, 0x00, 0x00, 0xff},
+		thumbColor: color.RGBA{0x00, 0xff, 0x00, 0xff},
+		min:        min,
+		max:        max,
+		value:      value,
+		dragging:   false,
 	}
 }
 
 func (s *Slider) Draw(screen *ebiten.Image) {
-	radius := s.size.Y / 2
-	img := ebiten.NewImage(int(s.size.X+(4*radius)), int(s.size.Y+(2*radius)))
-	s.img = img
+	// Draw bar
+	barY := s.position.Y + s.size.Y/2 - 3
+	ebitenutil.DrawRect(screen, s.position.X, barY, s.size.X, 6, s.barColor)
 
-	x_new := float64(s.cursorPosition)
-	if s.max > 10 {
-		x_new = (s.cursorPosition - 0) * (10 - 0) / (float64(s.max) - 0)
-	}
-
-	when0 := radius
-
-	ebitenutil.DrawRect(img, radius, radius, s.size.X, s.size.Y, s.colorSlider)
-	if s.circleCorner {
-		if x_new == 0 {
-			when0 += radius
-		}
-		ebitenutil.DrawCircle(img, radius, radius*2, radius, s.colorSlider)
-		ebitenutil.DrawCircle(img, s.size.X+radius, radius*2, radius, s.colorSlider)
-		ebitenutil.DrawCircle(img, when0+(radius*2)*float64(x_new), s.size.Y, radius*2, s.colorButton)
-	} else {
-		if x_new == 0 {
-			when0 = 0
-		}
-		ebitenutil.DrawRect(img, (radius*2)*float64(x_new)-when0, s.size.Y-radius*2, radius*4, radius*4, s.colorButton)
-	}
-
-	ot := &ebiten.DrawImageOptions{}
-	ot.GeoM.Translate(s.position.X, s.position.Y)
-	s.img = img
-	screen.DrawImage(img, ot)
+	// Draw thumb
+	thumbX := s.position.X + ((s.value-s.min)/(s.max-s.min))*s.size.X
+	thumbY := s.position.Y + s.size.Y/2
+	ebitenutil.DrawCircle(screen, thumbX, thumbY, s.size.Y/2, s.thumbColor)
 }
 
 func (s *Slider) Input() {
+	x, y := ebiten.CursorPosition()
+	cursor := Point{float64(x), float64(y)}
+	thumbX := s.position.X + ((s.value-s.min)/(s.max-s.min))*s.size.X
+	thumbY := s.position.Y + s.size.Y/2
 
+	// Start dragging if mouse pressed on thumb
 	if inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft) {
-		fmt.Println("click")
-		x, y := ebiten.CursorPosition()
-		pCursor := Point{float64(x), float64(y)}
-		x_new := float64(s.cursorPosition)
-		if s.max > 10 {
-			x_new = (s.cursorPosition - 0) * (10 - 0) / (float64(s.max) - 0)
+		dx := cursor.X - thumbX
+		dy := cursor.Y - thumbY
+		r := s.size.Y / 2
+		if dx*dx+dy*dy <= r*r {
+			s.dragging = true
 		}
-		sliderCursor := s.position.X - (s.size.Y / 2) + (s.size.Y)*float64(x_new)
-		if hover(pCursor, Point{(s.size.Y * 2), s.size.X * 2}, Point{sliderCursor, s.position.Y}, s.img, 1) {
-			if pCursor.X > sliderCursor+(s.size.Y) && x_new < 10 {
-				s.cursorPosition = (x_new + 1) * (float64(s.max) / 10)
-			} else if x_new >= 0 {
-				s.cursorPosition = (x_new - 1) * (float64(s.max) / 10)
-			}
+	}
+	// Stop dragging
+	if inpututil.IsMouseButtonJustReleased(ebiten.MouseButtonLeft) {
+		s.dragging = false
+	}
+	// Update value while dragging
+	if s.dragging {
+		rel := cursor.X - s.position.X
+		if rel < 0 {
+			rel = 0
 		}
+		if rel > s.size.X {
+			rel = s.size.X
+		}
+		s.value = s.min + (rel/s.size.X)*(s.max-s.min)
 	}
 }
 
-func (s *Slider) SetColor(color color.RGBA) {
-	s.colorSlider = color
+func (s *Slider) SetBarColor(color color.RGBA) {
+	s.barColor = color
 }
 
-func (s *Slider) SetColorButton(color color.RGBA) {
-	s.colorButton = color
+func (s *Slider) SetThumbColor(color color.RGBA) {
+	s.thumbColor = color
+}
+
+// Optionally, add getters if you want to access value from outside the package
+func (s *Slider) Value() float64 {
+	return s.value
 }
