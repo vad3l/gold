@@ -24,7 +24,8 @@
                                                            \/____/          ~~              
                                                                                             
 ```
-![Logo](/Example/demo/data/logo.png)
+<img src="/Example/demo/data/logo.png" alt="Logo" width="200">
+
 
 
 ## GOLD

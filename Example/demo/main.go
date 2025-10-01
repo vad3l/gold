@@ -3,7 +3,7 @@ package main
 import (
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
-	. "github.com/vad3l/gui"
+	. "github.com/vad3l/gold/library/graphics"
 )
 
 func main() {

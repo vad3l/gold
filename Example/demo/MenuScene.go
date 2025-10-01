@@ -4,7 +4,8 @@ import (
 	"fmt"
 	"image/color"
 
-	. "github.com/vad3l/gui"
+	. "github.com/vad3l/gold/library/graphics"
+	. "github.com/vad3l/gold/library/graphics/gui"
 
 	"github.com/hajimehoshi/ebiten/v2"
 )

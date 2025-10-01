@@ -10,13 +10,13 @@ import (
 	"golang.org/x/image/font/basicfont"
 )
 
-type Contour struct {
+type Outline struct {
 	Position Point
 	Size     Point
 	Text     string
 }
 
-func (c *Contour) Draw(screen *ebiten.Image) {
+func (c *Outline) Draw(screen *ebiten.Image) {
 	/*
 		0,0 -> 0,y
 		0,y -> x,y
@@ -31,6 +31,6 @@ func (c *Contour) Draw(screen *ebiten.Image) {
 	ebitenutil.DrawLine(screen, c.Position.X+float64((len(c.Text)*7)+10), c.Position.Y, c.Position.X+c.Size.X, c.Position.Y, color.RGBA{0xff, 0x00, 0x00, 0xff})
 }
 
-func (c *Contour) Input(g *SceneManager) {
+func (c *Outline) Input(g *SceneManager) {
 	return
 }
