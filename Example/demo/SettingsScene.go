@@ -94,7 +94,7 @@ func (m *SettingsScene) Update(g *SceneManager) error {
 	m.basicButton.Input()
 
 	if m.backButton.Execute {
-		g.Current_scene = NewMenuScene()
+		g.ChangeScene("MenuScene")
 		m.backButton.Execute = false
 	}
 	return nil
@@ -102,4 +102,8 @@ func (m *SettingsScene) Update(g *SceneManager) error {
 
 func (m *SettingsScene) Layout(outsideWidth, outsideHeight int) (int, int) {
 	return 1280, 720
+}
+
+func (m *SettingsScene) Name() string {
+	return "SettingsScene"
 }

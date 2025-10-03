@@ -48,3 +48,7 @@ func (m *MenuScene) Update(g *SceneManager) error {
 func (m *MenuScene) Layout(outsideWidth, outsideHeight int) (int, int) {
 	return 1280, 720
 }
+
+func (m *MenuScene) Name() string {
+	return "MenuScene"
+}

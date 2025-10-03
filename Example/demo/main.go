@@ -9,9 +9,12 @@ import (
 func main() {
 	ebiten.SetWindowSize(1280, 720)
 	ebiten.SetTPS(200)
-	g := &SceneManager{
-		Current_scene: NewMenuScene(),
-	}
+	g := &SceneManager{}
+	g.AddScene(NewMenuScene())
+	g.AddScene(NewExampleOne())
+	g.AddScene(NewExampleTwo())
+	g.AddScene(NewExampleThree())
+	g.AddScene(NewSettingsScene())
 
 	if err := ebiten.RunGame(g); err != nil {
 		if err != Quit_game {
@@ -22,10 +25,10 @@ func main() {
 
 func chooseScene(g *SceneManager) {
 	if inpututil.IsKeyJustReleased(ebiten.Key1) {
-		g.Current_scene = NewExampleOne()
+		g.ChangeScene("ExampleOne")
 	} else if inpututil.IsKeyJustReleased(ebiten.Key2) {
-		g.Current_scene = NewExampleTwo()
+		g.ChangeScene("ExampleTwo")
 	} else if inpututil.IsKeyJustReleased(ebiten.Key3) {
-		g.Current_scene = NewExampleThree()
+		g.ChangeScene("ExampleThree")
 	}
 }

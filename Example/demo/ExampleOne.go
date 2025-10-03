@@ -62,7 +62,7 @@ func (m *ExampleOne) Update(g *SceneManager) error {
 	}
 
 	if m.settingsButton.Execute {
-		g.Current_scene = NewSettingsScene()
+		g.ChangeScene("SettingsScene")
 		m.settingsButton.Execute = false
 	}
 
@@ -77,4 +77,8 @@ func (m *ExampleOne) Update(g *SceneManager) error {
 
 func (m *ExampleOne) Layout(outsideWidth, outsideHeight int) (int, int) {
 	return 1280, 720
+}
+
+func (m *ExampleOne) Name() string {
+	return "ExampleOne"
 }

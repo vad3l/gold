@@ -18,6 +18,10 @@ func (g *SceneManager) AddScene(scene Scene) {
 	}
 }
 
+func (g *SceneManager) SetScene(scene Scene) {
+	g.current_scene = scene
+}
+
 func (g *SceneManager) Draw(screen *ebiten.Image) {
 	if g.current_scene != nil {
 		g.current_scene.Draw(screen)
