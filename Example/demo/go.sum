@@ -16,6 +16,8 @@ github.com/pierrec/lz4/v4 v4.1.21 h1:yOVMLb6qSIDP67pl/5F7RepeKYu/VmTyEXvuMI5d9mQ
 github.com/pierrec/lz4/v4 v4.1.21/go.mod h1:gZWDp/Ze/IJXGXf23ltt2EXimqmTUXEy0GFuRQyBid4=
 github.com/vad3l/gold v0.0.0-20251001181011-db957eafcc5d h1:44aUeJ80QMp1Zh5R2dX+OsQGSXjvlazH/2/axHOU7po=
 github.com/vad3l/gold v0.0.0-20251001181011-db957eafcc5d/go.mod h1:uEwIqh9zvCPpDEv49SuCXWYoB5Y430vQyj8bZTcUy5Q=
+github.com/vad3l/gold v0.0.0-20251003172035-155e289cf293 h1:jmLpA9Voq/jstNo+93ISQrR6q4h5xyo9YllEu0ewVok=
+github.com/vad3l/gold v0.0.0-20251003172035-155e289cf293/go.mod h1:uEwIqh9zvCPpDEv49SuCXWYoB5Y430vQyj8bZTcUy5Q=
 golang.org/x/image v0.31.0 h1:mLChjE2MV6g1S7oqbXC0/UcKijjm5fnJLUYKIYrLESA=
 golang.org/x/image v0.31.0/go.mod h1:R9ec5Lcp96v9FTF+ajwaH3uGxPH4fKfHHAVbUILxghA=
 golang.org/x/sync v0.17.0 h1:l60nONMj9l5drqw6jlhIELNv9I0A4OFgRsG9k2oT9Ug=

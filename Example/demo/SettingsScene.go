@@ -33,6 +33,13 @@ func NewSettingsScene() *SettingsScene {
 	bigcheckbox2.SetColor(color.RGBA{0, 0, 200, 255})
 	bigcheckbox2.SetColorChecked(color.RGBA{0, 200, 0, 255})
 
+	radioGroup := NewRadioGroup()
+	bigcheckbox.SetRadioGroup(radioGroup)
+	bigcheckbox2.SetRadioGroup(radioGroup)
+
+	radioGroup.Add(&bigcheckbox)
+	radioGroup.Add(&bigcheckbox2)
+
 	bigoutline := Outline{
 		Point{500.0, 500.0},
 		Point{100, 200},

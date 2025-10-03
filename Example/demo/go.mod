@@ -4,7 +4,7 @@ go 1.24.0
 
 require (
 	github.com/hajimehoshi/ebiten/v2 v2.8.8
-	github.com/vad3l/gold v0.0.0-20251001181011-db957eafcc5d
+	github.com/vad3l/gold v0.0.0-20251003172035-155e289cf293
 )
 
 require (
