@@ -1,21 +1,49 @@
 package graphics
 
 import (
+	"errors"
+
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
 type SceneManager struct {
-	Current_scene Scene
+	scenes        []Scene
+	current_scene Scene
+}
+
+func (g *SceneManager) AddScene(scene Scene) {
+	g.scenes = append(g.scenes, scene)
+	if g.current_scene == nil {
+		g.current_scene = scene
+	}
 }
 
 func (g *SceneManager) Draw(screen *ebiten.Image) {
-	g.Current_scene.Draw(screen)
+	if g.current_scene != nil {
+		g.current_scene.Draw(screen)
+	}
 }
 
 func (g *SceneManager) Update() error {
-	return g.Current_scene.Update(g)
+	if g.current_scene != nil {
+		return g.current_scene.Update(g)
+	}
+	return nil
 }
 
 func (g *SceneManager) Layout(outsideWidth, outsideHeight int) (int, int) {
-	return g.Current_scene.Layout(1280, 720)
+	if g.current_scene != nil {
+		return g.current_scene.Layout(outsideWidth, outsideHeight)
+	}
+	return outsideWidth, outsideHeight
+}
+
+func (g *SceneManager) ChangeScene(name string) error {
+	for _, scene := range g.scenes {
+		if scene.Name() == name {
+			g.current_scene = scene
+			return nil
+		}
+	}
+	return errors.New("scene not found: " + name)
 }

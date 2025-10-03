@@ -16,6 +16,7 @@ type Scene interface {
 	Draw(screen *ebiten.Image)
 	Layout(outsideWidth, outsideHeight int) (int, int)
 	Update(g *SceneManager) error
+	Name() string
 }
 
 func DrawTPS(screen *ebiten.Image) {
@@ -23,7 +24,7 @@ func DrawTPS(screen *ebiten.Image) {
 }
 
 func DrawFPS(screen *ebiten.Image) {
-	ebitenutil.DebugPrintAt(screen, fmt.Sprintf("FPS: %.2f", ebiten.ActualTPS()), 0, 15)
+	ebitenutil.DebugPrintAt(screen, fmt.Sprintf("FPS: %.2f", ebiten.ActualFPS()), 0, 15)
 }
 
 func DrawDebug(screen *ebiten.Image) {
