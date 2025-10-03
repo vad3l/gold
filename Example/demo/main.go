@@ -8,7 +8,7 @@ import (
 
 func main() {
 	ebiten.SetWindowSize(1280, 720)
-	ebiten.SetMaxTPS(200)
+	ebiten.SetTPS(200)
 	g := &SceneManager{
 		Current_scene: NewMenuScene(),
 	}

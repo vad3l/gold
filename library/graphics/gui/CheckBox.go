@@ -20,7 +20,8 @@ type CheckBox struct {
 	Execute              bool
 	radius               int
 
-	img *ebiten.Image
+	img        *ebiten.Image
+	radioGroup *RadioGroup // Ajout pour le mode radio
 }
 
 func NewCheckBox(size, position Point) CheckBox {
@@ -34,6 +35,7 @@ func NewCheckBox(size, position Point) CheckBox {
 		false,
 		false,
 		0,
+		nil,
 		nil,
 	}
 }
@@ -77,10 +79,18 @@ func (c *CheckBox) Input() {
 		x, y := ebiten.CursorPosition()
 		pCursor := Point{float64(x), float64(y)}
 		if hover(pCursor, c.Size, c.position, c.img, 1) {
-			c.Checked = !c.Checked
-			c.Execute = true
+			if c.radioGroup != nil {
+				c.radioGroup.Select(c)
+			} else {
+				c.Checked = !c.Checked
+				c.Execute = true
+			}
 		}
 	}
+}
+
+func (c *CheckBox) SetRadioGroup(group *RadioGroup) {
+	c.radioGroup = group
 }
 
 func (c *CheckBox) SetRadius(radius int) {
@@ -110,4 +120,30 @@ func (c *CheckBox) SetBorderSize(border float64) {
 		return
 	}
 	c.borderSize = border
+}
+
+type RadioGroup struct {
+	checkBoxes []*CheckBox
+}
+
+func NewRadioGroup() *RadioGroup {
+	return &RadioGroup{
+		checkBoxes: []*CheckBox{},
+	}
+}
+
+func (g *RadioGroup) Add(cb *CheckBox) {
+	g.checkBoxes = append(g.checkBoxes, cb)
+}
+
+func (g *RadioGroup) Select(selected *CheckBox) {
+	for _, cb := range g.checkBoxes {
+		if cb == selected {
+			cb.Checked = true
+			cb.Execute = true
+		} else {
+			cb.Checked = false
+			cb.Execute = false
+		}
+	}
 }

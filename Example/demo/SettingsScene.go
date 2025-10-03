@@ -11,24 +11,27 @@ import (
 )
 
 type SettingsScene struct {
-	bigoutline *Outline
-	biglabel   *Label
-	//bigcheckbox	*Checkbox
-	backButton  *Button
-	basicButton *Button
+	bigoutline   *Outline
+	biglabel     *Label
+	bigcheckbox  *CheckBox
+	bigcheckbox2 *CheckBox
+	backButton   *Button
+	basicButton  *Button
 }
 
 func NewSettingsScene() *SettingsScene {
 
-	/*bigcheckbox := Checkbox{
-		0,
-		[]string{ "niggure", "nighga" },
-		[]Point{ Point{200, 200}, Point{300, 200} },
-		Point{50, 50},
-		func(g *SceneManager, i int) {
-			fmt.Println("bigCheckBox")
-		},
-	}*/
+	bigcheckbox := NewCheckBox(Point{30, 30}, Point{100, 400})
+	bigcheckbox.SetRadius(8)
+	bigcheckbox.SetBorderSize(5)
+	bigcheckbox.SetColor(color.RGBA{0, 0, 200, 255})
+	bigcheckbox.SetColorChecked(color.RGBA{0, 200, 0, 255})
+
+	bigcheckbox2 := NewCheckBox(Point{30, 30}, Point{150, 450})
+	bigcheckbox2.SetRadius(8)
+	bigcheckbox2.SetBorderSize(5)
+	bigcheckbox2.SetColor(color.RGBA{0, 0, 200, 255})
+	bigcheckbox2.SetColorChecked(color.RGBA{0, 200, 0, 255})
 
 	bigoutline := Outline{
 		Point{500.0, 500.0},
@@ -59,7 +62,8 @@ func NewSettingsScene() *SettingsScene {
 	return &SettingsScene{
 		&bigoutline,
 		&biglabel,
-		//&bigcheckbox,
+		&bigcheckbox,
+		&bigcheckbox2,
 		&backButton,
 		&basicButton,
 	}
@@ -68,7 +72,8 @@ func NewSettingsScene() *SettingsScene {
 func (m *SettingsScene) Draw(screen *ebiten.Image) {
 	screen.Fill(color.RGBA{0xb9, 0xf3, 0xff, 0xff})
 	m.backButton.Draw(screen)
-	//m.bigcheckbox.Draw(screen)
+	m.bigcheckbox.Draw(screen)
+	m.bigcheckbox2.Draw(screen)
 	m.biglabel.Draw(screen)
 	m.bigoutline.Draw(screen)
 	m.basicButton.Draw(screen)
@@ -77,7 +82,8 @@ func (m *SettingsScene) Draw(screen *ebiten.Image) {
 func (m *SettingsScene) Update(g *SceneManager) error {
 	m.backButton.Input()
 	m.biglabel.Input(g)
-	//m.bigcheckbox.Input(g)
+	m.bigcheckbox.Input()
+	m.bigcheckbox2.Input()
 	m.basicButton.Input()
 
 	if m.backButton.Execute {
