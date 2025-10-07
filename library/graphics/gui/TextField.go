@@ -70,7 +70,7 @@ func (t *TextField) Draw(screen *ebiten.Image) {
 	}
 
 	textX := t.Position.X - t.ScrollOffsetX
-	textY := t.Position.Y + int(t.Size.Y/2)
+	textY := t.Position.Y + t.Size.Y/2
 	text.Draw(screen, displayText, t.Font, int(textX), int(textY), t.ColorText)
 
 	if t.Active {
@@ -95,7 +95,7 @@ func (t *TextField) Input() {
 	}
 
 	if t.Active {
-		for _, r := range inpututil.InputChars() {
+		for _, r := range ebiten.InputChars() {
 			if t.NumericOnly && (r < '0' || r > '9') {
 				continue
 			}
