@@ -43,14 +43,12 @@ func NewTextField(position, size Point) *TextField {
 }
 
 func (t *TextField) Draw(screen *ebiten.Image) {
-	// Draw background
 	bg := ebiten.NewImage(int(t.Size.X), int(t.Size.Y))
 	bg.Fill(t.ColorBG)
 	op := &ebiten.DrawImageOptions{}
 	op.GeoM.Translate(t.Position.X, t.Position.Y)
 	screen.DrawImage(bg, op)
 
-	// Draw text
 	displayText := t.Text
 	if t.Text == "" && !t.Active && t.placeholder != "" {
 		displayText = t.placeholder
@@ -62,7 +60,6 @@ func (t *TextField) Input() {
 	x, y := ebiten.CursorPosition()
 	pCursor := Point{float64(x), float64(y)}
 
-	// Check if clicked inside field
 	if inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft) {
 		if pCursor.X >= t.Position.X && pCursor.X <= t.Position.X+t.Size.X &&
 			pCursor.Y >= t.Position.Y && pCursor.Y <= t.Position.Y+t.Size.Y {
@@ -74,13 +71,11 @@ func (t *TextField) Input() {
 
 	if t.Active {
 		for _, r := range inpututil.AppendPressedKeys(nil) {
-			// Handle backspace
 			if r == 8 || r == 127 {
 				if len(t.Text) > 0 {
 					t.Text = t.Text[:len(t.Text)-1]
 				}
 			} else if len(t.Text) < t.MaxLength {
-				// Add printable characters only
 				if r >= 32 && r <= 126 {
 					t.Text += string(r)
 				}
