@@ -7,7 +7,6 @@ import (
 	"github.com/hajimehoshi/ebiten/v2"
 	. "github.com/vad3l/gold/library/graphics"
 	. "github.com/vad3l/gold/library/graphics/gui"
-	//"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 )
 
 type SettingsScene struct {
@@ -17,6 +16,7 @@ type SettingsScene struct {
 	bigcheckbox2 *CheckBox
 	backButton   *Button
 	basicButton  *Button
+	textField    *TextField
 }
 
 func NewSettingsScene() *SettingsScene {
@@ -46,12 +46,11 @@ func NewSettingsScene() *SettingsScene {
 		"bigoutline",
 	}
 
-	biglabel := NewLabel("To Show example push Arrow key \n\n					 				<--     -->", Point{0, 0})
+	biglabel := NewLabel("To Show example push Arrow key \n\n<-- -->", Point{0, 0})
 	biglabel.SetFunction(
 		func(g *SceneManager) {
-			fmt.Println("label")
+			fmt.Println("label clicked")
 		})
-
 	biglabel.SetColor(color.RGBA{0xff, 0xff, 0xff, 0xff})
 	biglabel.SetFont("data/dogicapixel.ttf")
 	biglabel.SetFontSize(50)
@@ -66,6 +65,14 @@ func NewSettingsScene() *SettingsScene {
 	backButton.SetFontSize(20)
 
 	basicButton := NewButton(Point{100, 200}, Point{800, 500}, "Basic")
+
+	// --- TextField ---
+	textField := NewTextField(Point{300, 40}, Point{400, 600}, "Entrez votre pseudo...")
+	textField.SetColor(color.RGBA{0xff, 0xff, 0xff, 0xff})
+	textField.SetColorText(color.RGBA{0x00, 0x00, 0x00, 0xff})
+	textField.SetFont("data/dogicapixel.ttf")
+	textField.SetFontSize(20)
+
 	return &SettingsScene{
 		&bigoutline,
 		&biglabel,
@@ -73,6 +80,7 @@ func NewSettingsScene() *SettingsScene {
 		&bigcheckbox2,
 		&backButton,
 		&basicButton,
+		&textField,
 	}
 }
 
@@ -84,6 +92,7 @@ func (m *SettingsScene) Draw(screen *ebiten.Image) {
 	m.biglabel.Draw(screen)
 	m.bigoutline.Draw(screen)
 	m.basicButton.Draw(screen)
+	m.textField.Draw(screen) // <-- dessine le TextField
 }
 
 func (m *SettingsScene) Update(g *SceneManager) error {
@@ -92,6 +101,7 @@ func (m *SettingsScene) Update(g *SceneManager) error {
 	m.bigcheckbox.Input()
 	m.bigcheckbox2.Input()
 	m.basicButton.Input()
+	m.textField.Input() // <-- mise à jour du TextField
 
 	if m.backButton.Execute {
 		g.ChangeScene("MenuScene")
