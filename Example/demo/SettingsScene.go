@@ -67,9 +67,10 @@ func NewSettingsScene() *SettingsScene {
 	basicButton := NewButton(Point{100, 200}, Point{800, 500}, "Basic")
 
 	// --- TextField ---
-	textField := NewTextField(Point{300, 40}, Point{400, 600}, "Entrez votre pseudo...")
-	textField.SetColor(color.RGBA{0xff, 0xff, 0xff, 0xff})
-	textField.SetColorText(color.RGBA{0x00, 0x00, 0x00, 0xff})
+	textField := NewTextField(Point{300, 600}, Point{400, 40})
+	textField.SetBackgroundColor(color.RGBA{0xff, 0xff, 0xff, 0xff})
+	textField.SetTextColor(color.RGBA{0x00, 0x00, 0x00, 0xff})
+	textField.SetPlaceholder("Enter text here...")
 	textField.SetFont("data/dogicapixel.ttf")
 	textField.SetFontSize(20)
 
@@ -80,7 +81,7 @@ func NewSettingsScene() *SettingsScene {
 		&bigcheckbox2,
 		&backButton,
 		&basicButton,
-		&textField,
+		textField,
 	}
 }
 
@@ -92,7 +93,7 @@ func (m *SettingsScene) Draw(screen *ebiten.Image) {
 	m.biglabel.Draw(screen)
 	m.bigoutline.Draw(screen)
 	m.basicButton.Draw(screen)
-	m.textField.Draw(screen) // <-- dessine le TextField
+	m.textField.Draw(screen) // dessine le TextField
 }
 
 func (m *SettingsScene) Update(g *SceneManager) error {
@@ -101,7 +102,7 @@ func (m *SettingsScene) Update(g *SceneManager) error {
 	m.bigcheckbox.Input()
 	m.bigcheckbox2.Input()
 	m.basicButton.Input()
-	m.textField.Input() // <-- mise à jour du TextField
+	m.textField.Input() // met à jour le TextField
 
 	if m.backButton.Execute {
 		g.ChangeScene("MenuScene")

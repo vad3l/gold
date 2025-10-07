@@ -2,7 +2,9 @@ package gui
 
 import (
 	"image/color"
+	"io/ioutil"
 
+	"github.com/golang/freetype/truetype"
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
 	"github.com/hajimehoshi/ebiten/v2/text"
@@ -16,6 +18,7 @@ type TextField struct {
 	Position    Point
 	Size        Point
 	Text        string
+	fontParsed  *truetype.Font
 	Font        font.Face
 	FontSize    float64
 	ColorText   color.RGBA
@@ -86,7 +89,22 @@ func (t *TextField) Input() {
 	}
 }
 
-func (t *TextField) SetFont(fontFace font.Face) {
+func (t *TextField) SetFont(path string) {
+	tt, err := ioutil.ReadFile(path)
+	if err != nil {
+		panic(err)
+	}
+	fontParsed, erre := truetype.Parse(tt)
+	if erre != nil {
+		panic(erre)
+	}
+	t.fontParsed = fontParsed
+
+	fontFace := truetype.NewFace(t.fontParsed, &truetype.Options{
+		Size:    t.FontSize,
+		DPI:     72,
+		Hinting: font.HintingFull,
+	})
 	t.Font = fontFace
 }
 
