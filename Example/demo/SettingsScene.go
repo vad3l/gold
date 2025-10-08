@@ -10,50 +10,49 @@ import (
 )
 
 type SettingsScene struct {
-	bigoutline   *Outline
-	biglabel     *Label
-	bigcheckbox  *CheckBox
-	bigcheckbox2 *CheckBox
+	bigOutline   *Outline
+	bigLabel     *Label
+	bigCheckbox  *CheckBox
+	bigCheckbox2 *CheckBox
 	backButton   *Button
 	basicButton  *Button
 	textField    *TextField
+	listView     *ListView
 }
 
 func NewSettingsScene() *SettingsScene {
 
-	bigcheckbox := NewCheckBox(Point{30, 30}, Point{100, 400})
-	bigcheckbox.SetRadius(8)
-	bigcheckbox.SetBorderSize(5)
-	bigcheckbox.SetColor(color.RGBA{0, 0, 200, 255})
-	bigcheckbox.SetColorChecked(color.RGBA{0, 200, 0, 255})
+	bigCheckbox := NewCheckBox(Point{30, 30}, Point{100, 400})
+	bigCheckbox.SetRadius(8)
+	bigCheckbox.SetBorderSize(5)
+	bigCheckbox.SetColor(color.RGBA{0, 0, 200, 255})
+	bigCheckbox.SetColorChecked(color.RGBA{0, 200, 0, 255})
 
-	bigcheckbox2 := NewCheckBox(Point{30, 30}, Point{150, 450})
-	bigcheckbox2.SetRadius(8)
-	bigcheckbox2.SetBorderSize(5)
-	bigcheckbox2.SetColor(color.RGBA{0, 0, 200, 255})
-	bigcheckbox2.SetColorChecked(color.RGBA{0, 200, 0, 255})
+	bigCheckbox2 := NewCheckBox(Point{30, 30}, Point{150, 450})
+	bigCheckbox2.SetRadius(8)
+	bigCheckbox2.SetBorderSize(5)
+	bigCheckbox2.SetColor(color.RGBA{0, 0, 200, 255})
+	bigCheckbox2.SetColorChecked(color.RGBA{0, 200, 0, 255})
 
 	radioGroup := NewRadioGroup()
-	bigcheckbox.SetRadioGroup(radioGroup)
-	bigcheckbox2.SetRadioGroup(radioGroup)
+	bigCheckbox.SetRadioGroup(radioGroup)
+	bigCheckbox2.SetRadioGroup(radioGroup)
+	radioGroup.Add(&bigCheckbox)
+	radioGroup.Add(&bigCheckbox2)
 
-	radioGroup.Add(&bigcheckbox)
-	radioGroup.Add(&bigcheckbox2)
-
-	bigoutline := Outline{
-		Point{500.0, 500.0},
-		Point{100, 200},
-		"bigoutline",
+	bigOutline := Outline{
+		Size:     Point{500, 500},
+		Position: Point{100, 200},
+		Text:     "bigoutline",
 	}
 
-	biglabel := NewLabel("To Show example push Arrow key \n\n<-- -->", Point{0, 0})
-	biglabel.SetFunction(
-		func(g *SceneManager) {
-			fmt.Println("label clicked")
-		})
-	biglabel.SetColor(color.RGBA{0xff, 0xff, 0xff, 0xff})
-	biglabel.SetFont("data/dogicapixel.ttf")
-	biglabel.SetFontSize(50)
+	bigLabel := NewLabel("To Show example push 1 2 3", Point{0, 0})
+	bigLabel.SetFunction(func() {
+		fmt.Println("label clicked")
+	})
+	bigLabel.SetColor(color.RGBA{0xff, 0xff, 0xff, 0xff})
+	bigLabel.SetFont("data/dogicapixel.ttf")
+	bigLabel.SetFontSize(50)
 
 	backButton := NewButton(Point{150, 50}, Point{50, 50}, "BACK")
 	backButton.SetRadius(150)
@@ -66,7 +65,6 @@ func NewSettingsScene() *SettingsScene {
 
 	basicButton := NewButton(Point{100, 200}, Point{800, 500}, "Basic")
 
-	// --- TextField ---
 	textField := NewTextField(Point{300, 600}, Point{400, 40})
 	textField.SetBackgroundColor(color.RGBA{0xff, 0xff, 0xff, 0xff})
 	textField.SetTextColor(color.RGBA{0x00, 0x00, 0x00, 0xff})
@@ -74,35 +72,48 @@ func NewSettingsScene() *SettingsScene {
 	textField.SetFont("data/dogicapixel.ttf")
 	textField.SetFontSize(20)
 
+	// ListView
+	listView := NewListView(Point{600, 200}, Point{200, 300})
+	for i := 1; i <= 10; i++ {
+		btn := NewButton(Point{0, 0}, Point{180, 40}, fmt.Sprintf("Item %d", i))
+		btn.SetFont("data/dogicapixel.ttf")
+		btn.SetFontSize(16)
+		listView.Add(&btn)
+	}
+
 	return &SettingsScene{
-		&bigoutline,
-		&biglabel,
-		&bigcheckbox,
-		&bigcheckbox2,
-		&backButton,
-		&basicButton,
-		textField,
+		bigOutline:   &bigOutline,
+		bigLabel:     &bigLabel,
+		bigCheckbox:  &bigCheckbox,
+		bigCheckbox2: &bigCheckbox2,
+		backButton:   &backButton,
+		basicButton:  &basicButton,
+		textField:    textField,
+		listView:     listView,
 	}
 }
 
 func (m *SettingsScene) Draw(screen *ebiten.Image) {
 	screen.Fill(color.RGBA{0xb9, 0xf3, 0xff, 0xff})
+
 	m.backButton.Draw(screen)
-	m.bigcheckbox.Draw(screen)
-	m.bigcheckbox2.Draw(screen)
-	m.biglabel.Draw(screen)
-	m.bigoutline.Draw(screen)
+	m.bigCheckbox.Draw(screen)
+	m.bigCheckbox2.Draw(screen)
+	m.bigLabel.Draw(screen)
+	m.bigOutline.Draw(screen)
 	m.basicButton.Draw(screen)
-	m.textField.Draw(screen) // dessine le TextField
+	m.textField.Draw(screen)
+	m.listView.Draw(screen)
 }
 
 func (m *SettingsScene) Update(g *SceneManager) error {
 	m.backButton.Input()
-	m.biglabel.Input(g)
-	m.bigcheckbox.Input()
-	m.bigcheckbox2.Input()
+	m.bigLabel.Input()
+	m.bigCheckbox.Input()
+	m.bigCheckbox2.Input()
 	m.basicButton.Input()
-	m.textField.Input() // met à jour le TextField
+	m.textField.Input()
+	m.listView.Input()
 
 	if m.backButton.Execute {
 		g.ChangeScene("MenuScene")

@@ -31,6 +31,6 @@ func (c *Outline) Draw(screen *ebiten.Image) {
 	ebitenutil.DrawLine(screen, c.Position.X+float64((len(c.Text)*7)+10), c.Position.Y, c.Position.X+c.Size.X, c.Position.Y, color.RGBA{0xff, 0x00, 0x00, 0xff})
 }
 
-func (c *Outline) Input(g *SceneManager) {
+func (c *Outline) Input() {
 	return
 }

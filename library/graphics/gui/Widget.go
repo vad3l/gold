@@ -8,8 +8,8 @@ import (
 )
 
 type Widget interface {
-	draw(g *SceneManager)
-	input(g *SceneManager)
+	Draw(screen *ebiten.Image)
+	Input()
 }
 
 func hover(pCursor, size, position Point, img *ebiten.Image, scale float64) bool {

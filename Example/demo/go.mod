@@ -4,7 +4,7 @@ go 1.24.0
 
 require (
 	github.com/hajimehoshi/ebiten/v2 v2.9.0
-	github.com/vad3l/gold v0.0.0-20251007191455-fed89e111541
+	github.com/vad3l/gold v0.0.0-20251007184647-01b1f146b0bd
 )
 
 require (
@@ -17,3 +17,5 @@ require (
 	golang.org/x/sync v0.17.0 // indirect
 	golang.org/x/sys v0.36.0 // indirect
 )
+
+replace github.com/vad3l/gold => C:/Users/xadel/Documents/Codes/gui

@@ -6,6 +6,7 @@ import (
 	_ "image/png"
 	"io/ioutil"
 	"log"
+	"math"
 
 	"golang.org/x/image/font"
 	"golang.org/x/image/font/basicfont"
@@ -26,21 +27,18 @@ type Button struct {
 	colorButton      color.RGBA
 	colorButtonHover color.RGBA
 	borderSize       float64
-
-	text           string
-	font           font.Face
-	fontSize       float64
-	fontParsed     *truetype.Font
-	colorText      color.RGBA
-	colorTextHover color.RGBA
-
-	radius  int
-	Execute bool
-	img     *ebiten.Image
+	text             string
+	font             font.Face
+	fontSize         float64
+	fontParsed       *truetype.Font
+	colorText        color.RGBA
+	colorTextHover   color.RGBA
+	radius           int
+	Execute          bool
+	img              *ebiten.Image
 }
 
 func NewButton(size, position Point, text string) Button {
-
 	return Button{
 		size,
 		position,
@@ -60,19 +58,19 @@ func NewButton(size, position Point, text string) Button {
 }
 
 func (b *Button) Draw(screen *ebiten.Image) {
-	img := ebiten.NewImage(int(b.Size.X), int(b.Size.Y))
+	width := int(math.Max(b.Size.X, 1))
+	height := int(math.Max(b.Size.Y, 1))
+	img := ebiten.NewImage(width, height)
 	b.img = img
 	x, y := ebiten.CursorPosition()
 	pCursor := Point{float64(x), float64(y)}
-
 	fontDimension := text.BoundString(b.font, b.text)
-	height := fontDimension.Max.Y * 2
-	if height == 0 {
-		height = int(b.fontSize/2) - 3
+	h := fontDimension.Max.Y * 2
+	if h == 0 {
+		h = int(b.fontSize/2) - 3
 	}
 	tx := int(b.Size.X/2) - (fontDimension.Max.X / 2)
-	ty := int(b.Size.Y/2) + height
-
+	ty := int(b.Size.Y/2) + h
 	if b.radius == 0 {
 		ebitenutil.DrawRect(img, 0, 0, b.Size.X, b.Size.Y, b.colorButton)
 		if hover(pCursor, b.Size, b.position, img, 1) {
@@ -84,7 +82,6 @@ func (b *Button) Draw(screen *ebiten.Image) {
 	} else {
 		ebitenutil.DrawRect(img, 0, 0+float64(b.radius), b.Size.X, b.Size.Y-2*float64(b.radius), b.colorButton)
 		ebitenutil.DrawRect(img, 0+float64(b.radius), 0, b.Size.X-2*float64(b.radius), b.Size.Y, b.colorButton)
-
 		ebitenutil.DrawCircle(img, 0+float64(b.radius), 0+float64(b.radius), float64(b.radius), b.colorButton)
 		ebitenutil.DrawCircle(img, 0+b.Size.X-float64(b.radius), 0+float64(b.radius), float64(b.radius), b.colorButton)
 		ebitenutil.DrawCircle(img, 0+float64(b.radius), 0+b.Size.Y-float64(b.radius), float64(b.radius), b.colorButton)
@@ -92,7 +89,6 @@ func (b *Button) Draw(screen *ebiten.Image) {
 		if hover(pCursor, b.Size, b.position, img, 1) {
 			ebitenutil.DrawRect(img, b.borderSize, b.borderSize+float64(b.radius), b.Size.X-b.borderSize*2, b.Size.Y-b.borderSize*2-2*float64(b.radius), b.colorButtonHover)
 			ebitenutil.DrawRect(img, b.borderSize+float64(b.radius), b.borderSize, b.Size.X-b.borderSize*2-2*float64(b.radius), b.Size.Y-b.borderSize*2, b.colorButtonHover)
-
 			ebitenutil.DrawCircle(img, b.borderSize+float64(b.radius), b.borderSize+float64(b.radius), float64(b.radius), b.colorButtonHover)
 			ebitenutil.DrawCircle(img, b.borderSize+b.Size.X-b.borderSize*2-float64(b.radius), b.borderSize+float64(b.radius), float64(b.radius), b.colorButtonHover)
 			ebitenutil.DrawCircle(img, b.borderSize+float64(b.radius), b.borderSize+b.Size.Y-b.borderSize*2-float64(b.radius), float64(b.radius), b.colorButtonHover)
@@ -102,11 +98,23 @@ func (b *Button) Draw(screen *ebiten.Image) {
 			text.Draw(img, b.text, b.font, tx, ty, b.colorText)
 		}
 	}
-
 	ot := &ebiten.DrawImageOptions{}
 	ot.GeoM.Translate(b.position.X, b.position.Y)
 	b.img = img
 	screen.DrawImage(img, ot)
+}
+
+func (b *Button) DrawAt(screen *ebiten.Image, pos Point) {
+	oldPos := b.position
+	b.position = pos
+	if b.Size.X <= 0 {
+		b.Size.X = 100
+	}
+	if b.Size.Y <= 0 {
+		b.Size.Y = 30
+	}
+	b.Draw(screen)
+	b.position = oldPos
 }
 
 func (b *Button) Input() {
@@ -152,8 +160,6 @@ func (b *Button) SetFont(path string) {
 		panic(erre)
 	}
 	b.fontParsed = fontParsed
-
-	// Create a font face with a specific size
 	fontFace := truetype.NewFace(b.fontParsed, &truetype.Options{
 		Size:    b.fontSize,
 		DPI:     72,
@@ -192,21 +198,13 @@ func (b *Button) SetBorderSize(size float64) {
 	b.borderSize = size
 }
 
-/*******************
-*
-*	Sprite Button
-*
- */ //////////////////
-
 type SpriteButton struct {
-	position Point
-	scale    float64
-
+	position   Point
+	scale      float64
 	imgDefault *ebiten.Image
 	imgHover   *ebiten.Image
 	imgClicked *ebiten.Image
-
-	Execute bool
+	Execute    bool
 }
 
 func NewSpriteButton(position Point, pathImgDefault, pathImgHover, pathImgClicked string) SpriteButton {
@@ -216,14 +214,12 @@ func NewSpriteButton(position Point, pathImgDefault, pathImgHover, pathImgClicke
 	if err != nil || errs != nil || erres != nil {
 		log.Fatalf("Failed to load image for sprite button :\n%s\n%s\n%s", pathImgDefault, pathImgHover, pathImgClicked)
 	}
-
 	xDef, yDef := imgDefault.Size()
 	xHov, yHov := imgHover.Size()
 	xCli, yCli := imgClicked.Size()
 	if xDef != xHov || yDef != yHov || xDef != xCli || yDef != yCli {
 		log.Fatalf("ERROR with spriteButton the 3 image don't have same dimension")
 	}
-
 	return SpriteButton{
 		position,
 		1,
@@ -238,10 +234,8 @@ func (b *SpriteButton) Draw(screen *ebiten.Image) {
 	ot := &ebiten.DrawImageOptions{}
 	ot.GeoM.Scale(b.scale, b.scale)
 	ot.GeoM.Translate(b.position.X, b.position.Y)
-
 	x, y := ebiten.CursorPosition()
 	pCursor := Point{float64(x), float64(y)}
-
 	xx, yy := b.imgDefault.Size()
 	size := Point{float64(xx) * b.scale, float64(yy) * b.scale}
 	if hover(pCursor, size, b.position, b.imgDefault, b.scale) {
@@ -254,6 +248,7 @@ func (b *SpriteButton) Draw(screen *ebiten.Image) {
 		screen.DrawImage(b.imgDefault, ot)
 	}
 }
+
 func (b *SpriteButton) Input() {
 	if inpututil.IsMouseButtonJustReleased(ebiten.MouseButtonLeft) {
 		x, y := ebiten.CursorPosition()

@@ -16,9 +16,9 @@ type MenuScene struct {
 
 func NewMenuScene() *MenuScene {
 
-	biglabel := NewLabel("To Show example push Arrow key \n\n					 				A	Z	E", Point{0, 0})
+	biglabel := NewLabel("To Show example push \n\n					 				1	2	3", Point{0, 0})
 	biglabel.SetFunction(
-		func(g *SceneManager) {
+		func() {
 			fmt.Println("label")
 		})
 
@@ -39,7 +39,7 @@ func (m *MenuScene) Draw(screen *ebiten.Image) {
 }
 
 func (m *MenuScene) Update(g *SceneManager) error {
-	m.biglabel.Input(g)
+	m.biglabel.Input()
 	chooseScene(g)
 
 	return nil
