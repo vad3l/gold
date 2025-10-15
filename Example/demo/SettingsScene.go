@@ -18,6 +18,9 @@ type SettingsScene struct {
 	basicButton  *Button
 	textField    *TextField
 	listView     *ListView
+	// example buttons demonstrating wrapping and truncation
+	wrapButton  *Button
+	truncButton *Button
 }
 
 func NewSettingsScene() *SettingsScene {
@@ -107,6 +110,21 @@ func NewSettingsScene() *SettingsScene {
 		listView.Add(&btn)
 	}
 
+	// Example buttons demonstrating wrapping and truncation
+	wrapBtn := NewButton(Point{X: 360, Y: 40}, Point{X: leftX, Y: leftY + 160}, "This is a very long button label that will wrap to multiple lines when WrapText is enabled")
+	wrapBtn.SetFont("data/dogicapixel.ttf")
+	wrapBtn.SetFontSize(14)
+	wrapBtn.WrapText = true
+	wrapBtn.Ellipsis = false
+	wrapBtn.Padding = 8
+
+	truncBtn := NewButton(Point{X: 360, Y: 40}, Point{X: leftX, Y: leftY + 220}, "This is another very long label that will be truncated if it doesn't fit the button width")
+	truncBtn.SetFont("data/dogicapixel.ttf")
+	truncBtn.SetFontSize(14)
+	truncBtn.WrapText = false
+	truncBtn.Ellipsis = true
+	truncBtn.Padding = 8
+
 	return &SettingsScene{
 		bigOutline:   &bigOutline,
 		bigLabel:     &bigLabel,
@@ -116,6 +134,8 @@ func NewSettingsScene() *SettingsScene {
 		basicButton:  &applyButton,
 		textField:    tf,
 		listView:     listView,
+		wrapButton:   &wrapBtn,
+		truncButton:  &truncBtn,
 	}
 }
 
@@ -134,6 +154,13 @@ func (m *SettingsScene) Draw(screen *ebiten.Image) {
 	m.bigCheckbox2.Draw(screen)
 	m.textField.Draw(screen)
 	m.basicButton.Draw(screen)
+	// example buttons
+	if m.wrapButton != nil {
+		m.wrapButton.Draw(screen)
+	}
+	if m.truncButton != nil {
+		m.truncButton.Draw(screen)
+	}
 
 	// Right panel list
 	m.listView.Draw(screen)
@@ -147,6 +174,12 @@ func (m *SettingsScene) Update(g *SceneManager) error {
 	m.basicButton.Input()
 	m.textField.Input()
 	m.listView.Input()
+	if m.wrapButton != nil {
+		m.wrapButton.Input()
+	}
+	if m.truncButton != nil {
+		m.truncButton.Input()
+	}
 
 	if m.backButton.Execute {
 		g.ChangeScene("MenuScene")

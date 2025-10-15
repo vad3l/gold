@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"log"
 	"math"
+	"strings"
 
 	"golang.org/x/image/font"
 	"golang.org/x/image/font/basicfont"
@@ -36,48 +37,189 @@ type Button struct {
 	radius           int
 	Execute          bool
 	img              *ebiten.Image
+	// WrapText enables word-wrapping inside the button. When enabled,
+	// the button will grow vertically to fit the wrapped lines.
+	WrapText bool
+	// Ellipsis will add "..." when truncating text (only used when WrapText==false)
+	Ellipsis bool
+	// Padding around the text (pixels)
+	Padding int
+	// extra pixels between lines when wrapped
+	LineSpacing int
 }
 
 func NewButton(size, position gfx.Point, text string) Button {
 	return Button{
 		size,
 		position,
-		color.RGBA{0xff, 0x00, 0x00, 0xff},
-		color.RGBA{0x00, 0xff, 0x00, 0xff},
-		10.0,
+		// base: soft pale blue to match Outline panel
+		color.RGBA{0xd3, 0xe8, 0xff, 0xff},
+		// hover: slightly deeper blue
+		color.RGBA{0xbf, 0xdf, 0xff, 0xff},
+		2.0,
 		text,
 		basicfont.Face7x13,
-		12,
+		14,
 		nil,
-		color.RGBA{0x00, 0x00, 0x00, 0xff},
-		color.RGBA{0x00, 0x00, 0x00, 0xff},
+		color.RGBA{0x10, 0x17, 0x17, 0xff},
+		color.RGBA{0x06, 0x0b, 0x0b, 0xff},
 		0,
 		false,
 		nil,
+		false,
+		true,
+		6,
+		4,
 	}
 }
 
 func (b *Button) Draw(screen *ebiten.Image) {
 	width := int(math.Max(b.Size.X, 1))
-	height := int(math.Max(b.Size.Y, 1))
-	img := ebiten.NewImage(width, height)
-	b.img = img
+	// We'll compute renderHeight later (may grow if WrapText is enabled)
+	baseHeight := int(math.Max(b.Size.Y, 1))
+	var img *ebiten.Image
 	x, y := ebiten.CursorPosition()
 	pCursor := gfx.Point{X: float64(x), Y: float64(y)}
-	fontDimension := text.BoundString(b.font, b.text)
-	h := fontDimension.Max.Y * 2
-	if h == 0 {
-		h = int(b.fontSize/2) - 3
+	// compute available content width (inside paddings)
+	padding := b.Padding
+	if padding < 0 {
+		padding = 0
 	}
-	tx := int(b.Size.X/2) - (fontDimension.Max.X / 2)
-	ty := int(b.Size.Y/2) + h
+	availWidth := width - padding*2
+
+	// helper to measure string width using current font
+	measure := func(s string) int {
+		d := text.BoundString(b.font, s)
+		return d.Max.X - d.Min.X
+	}
+
+	// line height using font metrics
+	ascent := int(b.font.Metrics().Ascent >> 6)
+	descent := int(b.font.Metrics().Descent >> 6)
+	lineHeight := ascent + descent
+
+	lines := []string{b.text}
+	if b.WrapText && availWidth > 10 {
+		// word-wrap into lines that fit availWidth
+		words := strings.Fields(b.text)
+		var cur strings.Builder
+		lines = []string{}
+		for i, w := range words {
+			if cur.Len() == 0 {
+				cur.WriteString(w)
+			} else {
+				// try with a space + word
+				test := cur.String() + " " + w
+				if measure(test) <= availWidth {
+					cur.WriteString(" ")
+					cur.WriteString(w)
+				} else {
+					// push current and start new
+					lines = append(lines, cur.String())
+					cur.Reset()
+					cur.WriteString(w)
+				}
+			}
+			// if last word, push remaining
+			if i == len(words)-1 && cur.Len() > 0 {
+				lines = append(lines, cur.String())
+			}
+		}
+		// If no words (empty) ensure single empty line
+		if len(lines) == 0 {
+			lines = []string{""}
+		}
+	} else {
+		// no wrap: possibly truncate to available width
+		if availWidth > 10 {
+			if measure(b.text) > availWidth {
+				if b.Ellipsis {
+					// leave space for ellipsis
+					ell := "..."
+					ellW := measure(ell)
+					// binary search max prefix length that fits availWidth-ellW
+					lo, hi := 0, len(b.text)
+					for lo < hi {
+						mid := (lo + hi + 1) / 2
+						if measure(b.text[:mid]) <= (availWidth - ellW) {
+							lo = mid
+						} else {
+							hi = mid - 1
+						}
+					}
+					if lo < len(b.text) {
+						lines = []string{b.text[:lo] + ell}
+					} else {
+						lines = []string{b.text}
+					}
+				} else {
+					// truncate without ellipsis
+					lo, hi := 0, len(b.text)
+					for lo < hi {
+						mid := (lo + hi + 1) / 2
+						if measure(b.text[:mid]) <= availWidth {
+							lo = mid
+						} else {
+							hi = mid - 1
+						}
+					}
+					lines = []string{b.text[:lo]}
+				}
+			} else {
+				lines = []string{b.text}
+			}
+		}
+	}
+
+	// compute needed height for lines + paddings (account for LineSpacing between lines)
+	extraSpacing := 0
+	if len(lines) > 1 {
+		extraSpacing = b.LineSpacing * (len(lines) - 1)
+	}
+	neededHeight := lineHeight*len(lines) + extraSpacing + padding*2
+	renderHeight := baseHeight
+	if b.WrapText && neededHeight > baseHeight {
+		renderHeight = neededHeight
+		// update actual size so subsequent layout can adapt
+		b.Size.Y = float64(renderHeight)
+	}
+	height := renderHeight
+	img = ebiten.NewImage(width, height)
+	b.img = img
 	if b.radius == 0 {
-		ebitenutil.DrawRect(img, 0, 0, b.Size.X, b.Size.Y, b.colorButton)
+		// drop shadow
+		shadowCol := color.RGBA{0x00, 0x00, 0x00, 0x30}
+		ebitenutil.DrawRect(img, 3, 3, b.Size.X, float64(height), shadowCol)
+		// base
+		ebitenutil.DrawRect(img, 0, 0, b.Size.X, float64(height), b.colorButton)
+		// top highlight (subtle)
+		highCol := b.colorButton
+		highCol.A = 0x40
+		ebitenutil.DrawRect(img, 2, 2, b.Size.X-4, float64(height)/3, highCol)
 		if hover(pCursor, b.Size, b.position, img, 1) {
-			ebitenutil.DrawRect(img, b.borderSize, b.borderSize, b.Size.X-b.borderSize*2, b.Size.Y-b.borderSize*2, b.colorButtonHover)
-			text.Draw(img, b.text, b.font, tx, ty, b.colorTextHover)
-		} else {
-			text.Draw(img, b.text, b.font, tx, ty, b.colorText)
+			// hovered inner fill
+			ebitenutil.DrawRect(img, b.borderSize, b.borderSize, b.Size.X-b.borderSize*2, float64(height)-b.borderSize*2, b.colorButtonHover)
+			// glow border
+			glow := b.colorButtonHover
+			if glow.A > 0x80 {
+				glow.A = 0x80
+			}
+			ebitenutil.DrawRect(img, 0, 0, b.Size.X, float64(2), glow)
+		}
+		// draw lines centered horizontally and vertically (account for LineSpacing)
+		totalTextHeight := lineHeight*len(lines) + extraSpacing
+		// baseline start (top Y for first line's baseline)
+		startY := (height-totalTextHeight)/2 + ascent
+		for i, line := range lines {
+			d := text.BoundString(b.font, line)
+			lineW := d.Max.X - d.Min.X
+			tx := int(float64(width)/2.0) - lineW/2
+			ty := startY + i*(lineHeight+b.LineSpacing)
+			if hover(pCursor, b.Size, b.position, img, 1) {
+				text.Draw(img, line, b.font, tx, ty, b.colorTextHover)
+			} else {
+				text.Draw(img, line, b.font, tx, ty, b.colorText)
+			}
 		}
 	} else {
 		ebitenutil.DrawRect(img, 0, 0+float64(b.radius), b.Size.X, b.Size.Y-2*float64(b.radius), b.colorButton)
@@ -86,16 +228,34 @@ func (b *Button) Draw(screen *ebiten.Image) {
 		ebitenutil.DrawCircle(img, 0+b.Size.X-float64(b.radius), 0+float64(b.radius), float64(b.radius), b.colorButton)
 		ebitenutil.DrawCircle(img, 0+float64(b.radius), 0+b.Size.Y-float64(b.radius), float64(b.radius), b.colorButton)
 		ebitenutil.DrawCircle(img, 0+b.Size.X-float64(b.radius), 0+b.Size.Y-float64(b.radius), float64(b.radius), b.colorButton)
+		// rounded corners: draw base shapes
+		ebitenutil.DrawRect(img, 0, 0+float64(b.radius), b.Size.X, float64(height)-2*float64(b.radius), b.colorButton)
+		ebitenutil.DrawRect(img, 0+float64(b.radius), 0, b.Size.X-2*float64(b.radius), float64(height), b.colorButton)
+		ebitenutil.DrawCircle(img, 0+float64(b.radius), 0+float64(b.radius), float64(b.radius), b.colorButton)
+		ebitenutil.DrawCircle(img, 0+b.Size.X-float64(b.radius), 0+float64(b.radius), float64(b.radius), b.colorButton)
+		ebitenutil.DrawCircle(img, 0+float64(b.radius), 0+float64(height)-float64(b.radius), float64(b.radius), b.colorButton)
+		ebitenutil.DrawCircle(img, 0+b.Size.X-float64(b.radius), 0+float64(height)-float64(b.radius), float64(b.radius), b.colorButton)
 		if hover(pCursor, b.Size, b.position, img, 1) {
-			ebitenutil.DrawRect(img, b.borderSize, b.borderSize+float64(b.radius), b.Size.X-b.borderSize*2, b.Size.Y-b.borderSize*2-2*float64(b.radius), b.colorButtonHover)
-			ebitenutil.DrawRect(img, b.borderSize+float64(b.radius), b.borderSize, b.Size.X-b.borderSize*2-2*float64(b.radius), b.Size.Y-b.borderSize*2, b.colorButtonHover)
+			ebitenutil.DrawRect(img, b.borderSize, b.borderSize+float64(b.radius), b.Size.X-b.borderSize*2, float64(height)-b.borderSize*2-2*float64(b.radius), b.colorButtonHover)
+			ebitenutil.DrawRect(img, b.borderSize+float64(b.radius), b.borderSize, b.Size.X-b.borderSize*2-2*float64(b.radius), float64(height)-b.borderSize*2, b.colorButtonHover)
 			ebitenutil.DrawCircle(img, b.borderSize+float64(b.radius), b.borderSize+float64(b.radius), float64(b.radius), b.colorButtonHover)
 			ebitenutil.DrawCircle(img, b.borderSize+b.Size.X-b.borderSize*2-float64(b.radius), b.borderSize+float64(b.radius), float64(b.radius), b.colorButtonHover)
-			ebitenutil.DrawCircle(img, b.borderSize+float64(b.radius), b.borderSize+b.Size.Y-b.borderSize*2-float64(b.radius), float64(b.radius), b.colorButtonHover)
-			ebitenutil.DrawCircle(img, b.borderSize+b.Size.X-b.borderSize*2-float64(b.radius), b.borderSize+b.Size.Y-b.borderSize*2-float64(b.radius), float64(b.radius), b.colorButtonHover)
-			text.Draw(img, b.text, b.font, tx, ty, b.colorTextHover)
-		} else {
-			text.Draw(img, b.text, b.font, tx, ty, b.colorText)
+			ebitenutil.DrawCircle(img, b.borderSize+float64(b.radius), b.borderSize+float64(height)-b.borderSize*2-float64(b.radius), float64(b.radius), b.colorButtonHover)
+			ebitenutil.DrawCircle(img, b.borderSize+b.Size.X-b.borderSize*2-float64(b.radius), b.borderSize+float64(height)-b.borderSize*2-float64(b.radius), float64(b.radius), b.colorButtonHover)
+		}
+		// draw text lines centered (account for LineSpacing)
+		totalTextHeight := lineHeight*len(lines) + extraSpacing
+		startY := (height-totalTextHeight)/2 + ascent
+		for i, line := range lines {
+			d := text.BoundString(b.font, line)
+			lineW := d.Max.X - d.Min.X
+			tx := int(float64(width)/2.0) - lineW/2
+			ty := startY + i*(lineHeight+b.LineSpacing)
+			if hover(pCursor, b.Size, b.position, img, 1) {
+				text.Draw(img, line, b.font, tx, ty, b.colorTextHover)
+			} else {
+				text.Draw(img, line, b.font, tx, ty, b.colorText)
+			}
 		}
 	}
 	ot := &ebiten.DrawImageOptions{}
