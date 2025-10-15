@@ -18,12 +18,12 @@ import (
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
 	"github.com/hajimehoshi/ebiten/v2/text"
 
-	. "github.com/vad3l/gold/library/graphics"
+	gfx "github.com/vad3l/gold/library/graphics"
 )
 
 type Button struct {
-	Size             Point
-	position         Point
+	Size             gfx.Point
+	position         gfx.Point
 	colorButton      color.RGBA
 	colorButtonHover color.RGBA
 	borderSize       float64
@@ -38,7 +38,7 @@ type Button struct {
 	img              *ebiten.Image
 }
 
-func NewButton(size, position Point, text string) Button {
+func NewButton(size, position gfx.Point, text string) Button {
 	return Button{
 		size,
 		position,
@@ -63,7 +63,7 @@ func (b *Button) Draw(screen *ebiten.Image) {
 	img := ebiten.NewImage(width, height)
 	b.img = img
 	x, y := ebiten.CursorPosition()
-	pCursor := Point{float64(x), float64(y)}
+	pCursor := gfx.Point{X: float64(x), Y: float64(y)}
 	fontDimension := text.BoundString(b.font, b.text)
 	h := fontDimension.Max.Y * 2
 	if h == 0 {
@@ -104,7 +104,7 @@ func (b *Button) Draw(screen *ebiten.Image) {
 	screen.DrawImage(img, ot)
 }
 
-func (b *Button) DrawAt(screen *ebiten.Image, pos Point) {
+func (b *Button) DrawAt(screen *ebiten.Image, pos gfx.Point) {
 	oldPos := b.position
 	b.position = pos
 	if b.Size.X <= 0 {
@@ -120,7 +120,7 @@ func (b *Button) DrawAt(screen *ebiten.Image, pos Point) {
 func (b *Button) Input() {
 	if inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft) {
 		x, y := ebiten.CursorPosition()
-		pCursor := Point{float64(x), float64(y)}
+		pCursor := gfx.Point{X: float64(x), Y: float64(y)}
 		if hover(pCursor, b.Size, b.position, b.img, 1) {
 			b.Execute = true
 		}
@@ -182,7 +182,7 @@ func (b *Button) SetFontSize(size float64) {
 	}
 }
 
-func (b *Button) SetPosition(position Point) {
+func (b *Button) SetPosition(position gfx.Point) {
 	b.position = position
 }
 
@@ -199,7 +199,7 @@ func (b *Button) SetBorderSize(size float64) {
 }
 
 type SpriteButton struct {
-	position   Point
+	position   gfx.Point
 	scale      float64
 	imgDefault *ebiten.Image
 	imgHover   *ebiten.Image
@@ -207,7 +207,7 @@ type SpriteButton struct {
 	Execute    bool
 }
 
-func NewSpriteButton(position Point, pathImgDefault, pathImgHover, pathImgClicked string) SpriteButton {
+func NewSpriteButton(position gfx.Point, pathImgDefault, pathImgHover, pathImgClicked string) SpriteButton {
 	imgDefault, _, err := ebitenutil.NewImageFromFile(pathImgDefault)
 	imgHover, _, errs := ebitenutil.NewImageFromFile(pathImgHover)
 	imgClicked, _, erres := ebitenutil.NewImageFromFile(pathImgClicked)
@@ -235,9 +235,9 @@ func (b *SpriteButton) Draw(screen *ebiten.Image) {
 	ot.GeoM.Scale(b.scale, b.scale)
 	ot.GeoM.Translate(b.position.X, b.position.Y)
 	x, y := ebiten.CursorPosition()
-	pCursor := Point{float64(x), float64(y)}
+	pCursor := gfx.Point{X: float64(x), Y: float64(y)}
 	xx, yy := b.imgDefault.Size()
-	size := Point{float64(xx) * b.scale, float64(yy) * b.scale}
+	size := gfx.Point{X: float64(xx) * b.scale, Y: float64(yy) * b.scale}
 	if hover(pCursor, size, b.position, b.imgDefault, b.scale) {
 		if ebiten.IsMouseButtonPressed(ebiten.MouseButtonLeft) {
 			screen.DrawImage(b.imgClicked, ot)
@@ -252,9 +252,9 @@ func (b *SpriteButton) Draw(screen *ebiten.Image) {
 func (b *SpriteButton) Input() {
 	if inpututil.IsMouseButtonJustReleased(ebiten.MouseButtonLeft) {
 		x, y := ebiten.CursorPosition()
-		pCursor := Point{float64(x), float64(y)}
+		pCursor := gfx.Point{X: float64(x), Y: float64(y)}
 		xx, yy := b.imgDefault.Size()
-		size := Point{float64(xx) * b.scale, float64(yy) * b.scale}
+		size := gfx.Point{X: float64(xx) * b.scale, Y: float64(yy) * b.scale}
 		if hover(pCursor, size, b.position, b.imgDefault, b.scale) {
 			b.Execute = true
 		}

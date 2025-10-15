@@ -16,6 +16,7 @@ type ExampleOne struct {
 	settingsButton *Button
 	quitButton     *Button
 	slider         *Slider // Ajout du slider
+	listView       *ListView
 }
 
 func NewExampleOne() *ExampleOne {
@@ -25,18 +26,27 @@ func NewExampleOne() *ExampleOne {
 	width, _ := ebiten.WindowSize()
 	widthWindow := float64(width)/2 - buttonWidth/2
 
-	playButton := NewButton(Point{buttonWidth, buttonHeight}, Point{widthWindow, 100}, "Play")
-	settingsButton := NewButton(Point{buttonWidth, buttonHeight}, Point{widthWindow, 300}, "Settings")
-	quitButton := NewButton(Point{buttonWidth, buttonHeight}, Point{widthWindow, 500}, "Quit")
+	playButton := NewButton(Point{X: buttonWidth, Y: buttonHeight}, Point{X: widthWindow, Y: 100}, "Play")
+	settingsButton := NewButton(Point{X: buttonWidth, Y: buttonHeight}, Point{X: widthWindow, Y: 300}, "Settings")
+	quitButton := NewButton(Point{X: buttonWidth, Y: buttonHeight}, Point{X: widthWindow, Y: 500}, "Quit")
 
 	// Instanciation du slider
-	slider := NewSlider(Point{400, 40}, Point{widthWindow, 650}, 0, 100, 50)
+	slider := NewSlider(Point{X: 400, Y: 40}, Point{X: widthWindow, Y: 650}, 0, 100, 50)
+
+	// Create a ListView and populate with buttons
+	lv := NewListView(Point{X: 100, Y: 150}, Point{X: 400, Y: 400})
+	for i := 0; i < 12; i++ {
+		btn := NewButton(Point{X: 360, Y: 40}, Point{X: 0, Y: 0}, fmt.Sprintf("Item %d", i+1))
+		// Use a pointer when adding so ListView can modify Execute
+		lv.Add(&btn)
+	}
 
 	return &ExampleOne{
 		&playButton,
 		&settingsButton,
 		&quitButton,
 		&slider, // Ajout du slider
+		lv,
 	}
 }
 
@@ -48,6 +58,9 @@ func (m *ExampleOne) Draw(screen *ebiten.Image) {
 	m.settingsButton.Draw(screen)
 	m.quitButton.Draw(screen)
 	m.slider.Draw(screen) // Dessine le slider
+	if m.listView != nil {
+		m.listView.Draw(screen)
+	}
 }
 
 func (m *ExampleOne) Update(g *SceneManager) error {
@@ -55,6 +68,9 @@ func (m *ExampleOne) Update(g *SceneManager) error {
 	m.settingsButton.Input()
 	m.quitButton.Input()
 	m.slider.Input() // Gère l'input du slider
+	if m.listView != nil {
+		m.listView.Input()
+	}
 
 	if m.playButton.Execute {
 		fmt.Println("play")

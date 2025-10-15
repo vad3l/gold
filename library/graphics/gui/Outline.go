@@ -6,29 +6,39 @@ import (
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 	"github.com/hajimehoshi/ebiten/v2/text"
-	. "github.com/vad3l/gold/library/graphics"
+	gfx "github.com/vad3l/gold/library/graphics"
 	"golang.org/x/image/font/basicfont"
 )
 
 type Outline struct {
-	Position Point
-	Size     Point
+	Position gfx.Point
+	Size     gfx.Point
 	Text     string
 }
 
 func (c *Outline) Draw(screen *ebiten.Image) {
-	/*
-		0,0 -> 0,y
-		0,y -> x,y
-		x,0 -> x,y
-		0,t -> x,0
-	*/
+	// modern panel: shadow, fill, border, centered title
+	shadowOffset := 6.0
+	// shadow
+	ebitenutil.DrawRect(screen, c.Position.X+shadowOffset, c.Position.Y+shadowOffset, c.Size.X, c.Size.Y, color.RGBA{0, 0, 0, 40})
+	// panel background
+	panelColor := color.RGBA{240, 248, 255, 255} // aliceblue-ish
+	ebitenutil.DrawRect(screen, c.Position.X, c.Position.Y, c.Size.X, c.Size.Y, panelColor)
+	// border
+	borderColor := color.RGBA{200, 100, 120, 180}
+	ebitenutil.DrawRect(screen, c.Position.X, c.Position.Y, c.Size.X, 2, borderColor)
+	ebitenutil.DrawRect(screen, c.Position.X, c.Position.Y+c.Size.Y-2, c.Size.X, 2, borderColor)
+	ebitenutil.DrawRect(screen, c.Position.X, c.Position.Y, 2, c.Size.Y, borderColor)
+	ebitenutil.DrawRect(screen, c.Position.X+c.Size.X-2, c.Position.Y, 2, c.Size.Y, borderColor)
 
-	text.Draw(screen, c.Text, basicfont.Face7x13, int(c.Position.X+5), int(c.Position.Y), color.RGBA{0xff, 0x00, 0x00, 0xff})
-	ebitenutil.DrawLine(screen, c.Position.X, c.Position.Y-13, c.Position.X, c.Position.Y+c.Size.Y, color.RGBA{0xff, 0x00, 0x00, 0xff})
-	ebitenutil.DrawLine(screen, c.Position.X, c.Position.Y+c.Size.Y, c.Position.X+c.Size.X, c.Position.Y+c.Size.Y, color.RGBA{0xff, 0x00, 0x00, 0xff})
-	ebitenutil.DrawLine(screen, c.Position.X+c.Size.X, c.Position.Y, c.Position.X+c.Size.X, c.Position.Y+c.Size.Y, color.RGBA{0xff, 0x00, 0x00, 0xff})
-	ebitenutil.DrawLine(screen, c.Position.X+float64((len(c.Text)*7)+10), c.Position.Y, c.Position.X+c.Size.X, c.Position.Y, color.RGBA{0xff, 0x00, 0x00, 0xff})
+	// title centered at top
+	if c.Text != "" {
+		bounds := text.BoundString(basicfont.Face7x13, c.Text)
+		textW := float64(bounds.Max.X - bounds.Min.X)
+		titleX := c.Position.X + (c.Size.X / 2) - (textW / 2)
+		titleY := c.Position.Y + 14
+		text.Draw(screen, c.Text, basicfont.Face7x13, int(titleX), int(titleY), color.RGBA{255, 255, 255, 255})
+	}
 }
 
 func (c *Outline) Input() {

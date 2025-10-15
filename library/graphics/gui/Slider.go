@@ -6,12 +6,12 @@ import (
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
-	. "github.com/vad3l/gold/library/graphics"
+	gfx "github.com/vad3l/gold/library/graphics"
 )
 
 type Slider struct {
-	size       Point
-	position   Point
+	size       gfx.Point
+	position   gfx.Point
 	barColor   color.RGBA
 	thumbColor color.RGBA
 	min, max   float64
@@ -19,7 +19,7 @@ type Slider struct {
 	dragging   bool
 }
 
-func NewSlider(size, position Point, min, max, value float64) Slider {
+func NewSlider(size, position gfx.Point, min, max, value float64) Slider {
 	return Slider{
 		size:       size,
 		position:   position,
@@ -45,7 +45,7 @@ func (s *Slider) Draw(screen *ebiten.Image) {
 
 func (s *Slider) Input() {
 	x, y := ebiten.CursorPosition()
-	cursor := Point{float64(x), float64(y)}
+	cursor := gfx.Point{X: float64(x), Y: float64(y)}
 	thumbX := s.position.X + ((s.value-s.min)/(s.max-s.min))*s.size.X
 	thumbY := s.position.Y + s.size.Y/2
 

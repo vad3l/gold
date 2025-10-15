@@ -21,74 +21,100 @@ type SettingsScene struct {
 }
 
 func NewSettingsScene() *SettingsScene {
-
-	bigCheckbox := NewCheckBox(Point{30, 30}, Point{100, 400})
-	bigCheckbox.SetRadius(8)
-	bigCheckbox.SetBorderSize(5)
-	bigCheckbox.SetColor(color.RGBA{0, 0, 200, 255})
-	bigCheckbox.SetColorChecked(color.RGBA{0, 200, 0, 255})
-
-	bigCheckbox2 := NewCheckBox(Point{30, 30}, Point{150, 450})
-	bigCheckbox2.SetRadius(8)
-	bigCheckbox2.SetBorderSize(5)
-	bigCheckbox2.SetColor(color.RGBA{0, 0, 200, 255})
-	bigCheckbox2.SetColorChecked(color.RGBA{0, 200, 0, 255})
-
-	radioGroup := NewRadioGroup()
-	bigCheckbox.SetRadioGroup(radioGroup)
-	bigCheckbox2.SetRadioGroup(radioGroup)
-	radioGroup.Add(&bigCheckbox)
-	radioGroup.Add(&bigCheckbox2)
-
+	// Main panel outline (centered-ish)
+	panelPos := Point{X: 80, Y: 80}
+	panelSize := Point{X: 1120, Y: 560}
 	bigOutline := Outline{
-		Size:     Point{500, 500},
-		Position: Point{100, 200},
-		Text:     "bigoutline",
+		Size:     panelSize,
+		Position: panelPos,
+		Text:     "",
 	}
 
-	bigLabel := NewLabel("To Show example push 1 2 3", Point{0, 0})
+	// Title label - draw near top center of the panel
+	bigLabel := NewLabel("Settings", Point{X: panelPos.X + panelSize.X/2 - 40, Y: panelPos.Y + 18})
 	bigLabel.SetFunction(func() {
 		fmt.Println("label clicked")
 	})
-	bigLabel.SetColor(color.RGBA{0xff, 0xff, 0xff, 0xff})
+	bigLabel.SetColor(color.RGBA{0x00, 0x00, 0x00, 0xff})
 	bigLabel.SetFont("data/dogicapixel.ttf")
-	bigLabel.SetFontSize(50)
+	bigLabel.SetFontSize(28)
 
-	backButton := NewButton(Point{150, 50}, Point{50, 50}, "BACK")
-	backButton.SetRadius(150)
-	backButton.SetColor(color.RGBA{0xb5, 0xf1, 0xcc, 0xff})
-	backButton.SetColorHover(color.RGBA{0xe5, 0xfd, 0xd1, 0xff})
-	backButton.SetColorText(color.RGBA{0xFF, 0xAA, 0xCF, 0xff})
-	backButton.SetColorTextHover(color.RGBA{0xFF, 0xAA, 0xCF, 0xff})
+	// Left column: radio options with labels
+	leftX := panelPos.X + 30
+	leftY := panelPos.Y + 70
+	radioGroup := NewRadioGroup()
+
+	opt1 := NewCheckBox(Point{X: 20, Y: 20}, Point{X: leftX, Y: leftY})
+	opt1.SetRadius(4)
+	opt1.SetBorderSize(2)
+	opt1.SetColor(color.RGBA{0x88, 0x88, 0xff, 0xff})
+	opt1.SetColorChecked(color.RGBA{0x44, 0xaa, 0x44, 0xff})
+	opt1.SetRadioGroup(radioGroup)
+	radioGroup.Add(&opt1)
+
+	label1 := NewLabel("Option A (radio)", Point{X: leftX + 28, Y: leftY - 4})
+	label1.SetFont("data/dogicapixel.ttf")
+	label1.SetFontSize(16)
+
+	opt2 := NewCheckBox(Point{X: 20, Y: 20}, Point{X: leftX, Y: leftY + 40})
+	opt2.SetRadius(4)
+	opt2.SetBorderSize(2)
+	opt2.SetColor(color.RGBA{0x88, 0x88, 0xff, 0xff})
+	opt2.SetColorChecked(color.RGBA{0x44, 0xaa, 0x44, 0xff})
+	opt2.SetRadioGroup(radioGroup)
+	radioGroup.Add(&opt2)
+
+	label2 := NewLabel("Option B (radio)", Point{X: leftX + 28, Y: leftY + 36})
+	label2.SetFont("data/dogicapixel.ttf")
+	label2.SetFontSize(16)
+
+	// Small description label under radios
+	desc := NewLabel("Choose one of the options on the left.", Point{X: leftX, Y: leftY + 84})
+	desc.SetFont("data/dogicapixel.ttf")
+	desc.SetFontSize(14)
+
+	// Horizontal text field under left column
+	tf := NewTextField(Point{X: leftX, Y: leftY + 120}, Point{X: 360, Y: 28})
+	tf.SetBackgroundColor(color.RGBA{0xff, 0xff, 0xff, 0xff})
+	tf.SetTextColor(color.RGBA{0x00, 0x00, 0x00, 0xff})
+	tf.SetPlaceholder("Enter value...")
+	tf.SetFont("data/dogicapixel.ttf")
+	tf.SetFontSize(14)
+
+	// Bottom-left action buttons
+	backButton := NewButton(Point{X: 100, Y: 36}, Point{X: leftX, Y: panelPos.Y + panelSize.Y - 60}, "Back")
+	backButton.SetRadius(6)
+	backButton.SetColor(color.RGBA{0xd3, 0xe8, 0xff, 0xff})
+	backButton.SetColorHover(color.RGBA{0xbf, 0xdf, 0xff, 0xff})
 	backButton.SetFont("data/dogicapixel.ttf")
-	backButton.SetFontSize(20)
+	backButton.SetFontSize(16)
 
-	basicButton := NewButton(Point{100, 200}, Point{800, 500}, "Basic")
+	applyButton := NewButton(Point{X: 100, Y: 36}, Point{X: leftX + 120, Y: panelPos.Y + panelSize.Y - 60}, "Apply")
+	applyButton.SetRadius(6)
+	applyButton.SetColor(color.RGBA{0xc8, 0xff, 0xd0, 0xff})
+	applyButton.SetColorHover(color.RGBA{0xaa, 0xff, 0xc2, 0xff})
+	applyButton.SetFont("data/dogicapixel.ttf")
+	applyButton.SetFontSize(16)
 
-	textField := NewTextField(Point{300, 600}, Point{400, 40})
-	textField.SetBackgroundColor(color.RGBA{0xff, 0xff, 0xff, 0xff})
-	textField.SetTextColor(color.RGBA{0x00, 0x00, 0x00, 0xff})
-	textField.SetPlaceholder("Enter text here...")
-	textField.SetFont("data/dogicapixel.ttf")
-	textField.SetFontSize(20)
-
-	// ListView
-	listView := NewListView(Point{600, 200}, Point{200, 300})
-	for i := 1; i <= 10; i++ {
-		btn := NewButton(Point{0, 0}, Point{180, 40}, fmt.Sprintf("Item %d", i))
+	// Right panel ListView (smaller, navigator-style)
+	rvX := panelPos.X + panelSize.X - 360
+	rvY := panelPos.Y + 60
+	listView := NewListView(Point{X: rvX, Y: rvY}, Point{X: 320, Y: panelSize.Y - 120})
+	for i := 1; i <= 8; i++ {
+		btn := NewButton(Point{X: 300, Y: 36}, Point{X: 0, Y: 0}, fmt.Sprintf("Setting %d", i))
 		btn.SetFont("data/dogicapixel.ttf")
-		btn.SetFontSize(16)
+		btn.SetFontSize(14)
 		listView.Add(&btn)
 	}
 
 	return &SettingsScene{
 		bigOutline:   &bigOutline,
 		bigLabel:     &bigLabel,
-		bigCheckbox:  &bigCheckbox,
-		bigCheckbox2: &bigCheckbox2,
+		bigCheckbox:  &opt1,
+		bigCheckbox2: &opt2,
 		backButton:   &backButton,
-		basicButton:  &basicButton,
-		textField:    textField,
+		basicButton:  &applyButton,
+		textField:    tf,
 		listView:     listView,
 	}
 }
@@ -96,13 +122,20 @@ func NewSettingsScene() *SettingsScene {
 func (m *SettingsScene) Draw(screen *ebiten.Image) {
 	screen.Fill(color.RGBA{0xb9, 0xf3, 0xff, 0xff})
 
+	// Draw main panel
+	m.bigOutline.Draw(screen)
+
+	// Header and back
 	m.backButton.Draw(screen)
+	m.bigLabel.Draw(screen)
+
+	// Left column controls (inside panel)
 	m.bigCheckbox.Draw(screen)
 	m.bigCheckbox2.Draw(screen)
-	m.bigLabel.Draw(screen)
-	m.bigOutline.Draw(screen)
-	m.basicButton.Draw(screen)
 	m.textField.Draw(screen)
+	m.basicButton.Draw(screen)
+
+	// Right panel list
 	m.listView.Draw(screen)
 }
 
